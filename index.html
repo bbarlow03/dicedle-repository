@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dicedle — a daily roll of the dice." />
+    <title>Dicedle — Roll your luck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="site-header">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <p class="eyebrow">A daily game of chance</p>
+            <h1>DICEDLE<span class="brand-dot">.</span></h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-button" id="help-button" aria-label="How to play">?</button>
+          <button class="icon-button" id="stats-button" aria-label="View stats">↗</button>
+        </div>
+      </header>
+
+      <section class="hero-copy" aria-labelledby="game-title">
+        <div>
+          <p class="round-label">ROUND 0124 <span class="live-dot"></span></p>
+          <h2 id="game-title">Roll with it.</h2>
+          <p class="lede">Guess the hidden six-letter word in six tries. Every roll gives you a clue.</p>
+        </div>
+        <div class="streak-card">
+          <span class="streak-icon">✦</span>
+          <div><strong>3</strong><small>day streak</small></div>
+        </div>
+      </section>
+
+      <section class="game-card" aria-label="Dicedle game">
+        <div class="board" id="board" aria-live="polite"></div>
+        <div class="game-status" id="game-status">Make your first guess</div>
+        <div class="keyboard" id="keyboard" aria-label="On-screen keyboard"></div>
+        <button class="new-game-button" id="new-game-button">New roll <span>↻</span></button>
+      </section>
+
+      <footer class="site-footer">
+        <span>GUESS WITH INTENTION</span>
+        <span>ONE PUZZLE EVERY DAY</span>
+      </footer>
+    </main>
+
+    <dialog class="modal" id="help-modal">
+      <button class="modal-close" data-close-modal aria-label="Close">×</button>
+      <p class="eyebrow">How to play</p>
+      <h2>Find the word.</h2>
+      <p>Type a six-letter word and press enter. Gold letters are in the word but in the wrong spot. Mint letters are exactly right.</p>
+      <div class="legend"><span class="legend-tile exact">A</span> Right letter, right place</div>
+      <div class="legend"><span class="legend-tile close">A</span> Right letter, wrong place</div>
+      <div class="legend"><span class="legend-tile miss">A</span> Not in the word</div>
+    </dialog>
+    <dialog class="modal" id="stats-modal">
+      <button class="modal-close" data-close-modal aria-label="Close">×</button>
+      <p class="eyebrow">Your run</p>
+      <h2>Keep the streak alive.</h2>
+      <div class="stats-grid"><div><strong>0</strong><span>Played</span></div><div><strong>0%</strong><span>Win rate</span></div><div><strong>3</strong><span>Current streak</span></div></div>
+    </dialog>
+    <script src="script.js"></script>
+  </body>
+</html>

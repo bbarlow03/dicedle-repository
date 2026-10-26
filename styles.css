@@ -1,0 +1,65 @@
+:root {
+  --ink: #1d2c32;
+  --muted: #718185;
+  --paper: #f4f2ec;
+  --card: #fffefb;
+  --line: #dfe2dc;
+  --mint: #8ad5bd;
+  --mint-dark: #266558;
+  --gold: #f4c46b;
+  --gold-dark: #845e20;
+  --shadow: 0 18px 50px rgba(41, 57, 58, .08);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Space Grotesk", sans-serif; }
+button { font: inherit; color: inherit; }
+.app-shell { width: min(100% - 40px, 920px); margin: 0 auto; padding: 32px 0 24px; }
+.site-header, .hero-copy, .site-footer { display: flex; align-items: center; justify-content: space-between; }
+.site-header { padding-bottom: 48px; }
+.brand-lockup { display: flex; align-items: center; gap: 13px; }
+.brand-mark { display: grid; grid-template-columns: repeat(3, 9px); gap: 5px; align-items: end; height: 29px; transform: rotate(-14deg); }
+.brand-mark span { display: block; width: 9px; height: 9px; background: var(--ink); border-radius: 50%; }
+.brand-mark span:nth-child(2) { height: 15px; border-radius: 6px; background: var(--mint); }
+.brand-mark span:nth-child(3) { height: 24px; border-radius: 6px; background: var(--gold); }
+.eyebrow, .round-label, .site-footer { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .12em; }
+.eyebrow { margin: 0 0 3px; color: var(--muted); }
+h1, h2, p { margin-top: 0; }
+h1 { margin: 0; font-size: 25px; line-height: 1; letter-spacing: -.06em; }
+.brand-dot { color: var(--mint-dark); }
+.header-actions { display: flex; gap: 9px; }
+.icon-button { width: 35px; height: 35px; border: 1px solid var(--line); background: transparent; border-radius: 50%; cursor: pointer; font-size: 16px; transition: .2s ease; }
+.icon-button:hover { background: var(--card); transform: translateY(-2px); }
+.hero-copy { align-items: end; margin-bottom: 25px; }
+.round-label { color: var(--mint-dark); margin: 0 0 10px; font-weight: 500; }
+.live-dot { display: inline-block; width: 6px; height: 6px; margin-left: 5px; border-radius: 50%; background: var(--mint); vertical-align: 1px; }
+h2 { font-size: clamp(36px, 7vw, 58px); line-height: .98; letter-spacing: -.07em; margin-bottom: 12px; }
+.lede { color: var(--muted); line-height: 1.5; max-width: 410px; margin-bottom: 0; font-size: 14px; }
+.streak-card { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.streak-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--gold-dark); background: #fbedcf; font-size: 20px; }
+.streak-card strong, .streak-card small { display: block; }
+.streak-card strong { font-size: 22px; line-height: 1; }
+.streak-card small { color: var(--muted); font-size: 10px; margin-top: 4px; }
+.game-card { padding: 30px 25px 24px; background: var(--card); border: 1px solid rgba(200, 207, 201, .6); border-radius: 23px; box-shadow: var(--shadow); }
+.board { display: grid; gap: 8px; width: min(100%, 365px); margin: 0 auto 21px; }
+.row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.tile { aspect-ratio: 1; display: grid; place-items: center; border: 1px solid #d9dfd9; border-radius: 8px; color: var(--ink); font-family: "DM Mono", monospace; font-size: clamp(18px, 4vw, 24px); font-weight: 500; transition: .2s ease; }
+.tile.filled { border-color: var(--ink); animation: pop .12s ease; }
+.tile.exact { color: #124b40; background: var(--mint); border-color: var(--mint); }
+.tile.close { color: #5b4113; background: var(--gold); border-color: var(--gold); }
+.tile.miss { color: #7a8485; background: #e6e9e4; border-color: #e6e9e4; }
+@keyframes pop { 50% { transform: scale(1.08); } }
+.game-status { min-height: 17px; margin-bottom: 17px; color: var(--muted); text-align: center; font-size: 12px; }
+.keyboard { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px 5px; max-width: 575px; margin: auto; }
+.key { height: 43px; min-width: 31px; padding: 0 9px; border: 0; border-radius: 6px; background: #e8ebe6; cursor: pointer; font-family: "DM Mono", monospace; font-size: 12px; font-weight: 500; transition: .15s ease; }
+.key:hover { background: #dce2db; transform: translateY(-2px); }
+.key.wide { min-width: 58px; font-size: 10px; }
+.key.exact { color: #124b40; background: var(--mint); }.key.close { color: #5b4113; background: var(--gold); }.key.miss { color: #7a8485; background: #d9ddda; }
+.new-game-button { display: block; margin: 24px auto 0; padding: 10px 18px; border: 1px solid var(--line); background: transparent; border-radius: 20px; color: var(--muted); cursor: pointer; font-size: 12px; transition: .2s ease; }
+.new-game-button:hover { color: var(--ink); border-color: var(--ink); }
+.new-game-button span { margin-left: 6px; font-size: 15px; }
+.site-footer { padding: 24px 3px 0; color: #a3acab; }
+.modal { width: min(calc(100% - 40px), 400px); padding: 34px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: var(--card); box-shadow: var(--shadow); }
+.modal::backdrop { background: rgba(29,44,50,.25); backdrop-filter: blur(3px); }.modal h2 { font-size: 36px; margin: 8px 0 14px; }.modal p:not(.eyebrow) { color: var(--muted); line-height: 1.6; font-size: 14px; }.modal-close { position: absolute; top: 13px; right: 16px; border: 0; background: transparent; font-size: 22px; cursor: pointer; }
+.legend { display: flex; align-items: center; gap: 9px; margin-top: 10px; color: var(--muted); font-size: 12px; }.legend-tile { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 5px; font-family: "DM Mono", monospace; font-weight: 500; }.legend-tile.exact { background: var(--mint); }.legend-tile.close { background: var(--gold); }.legend-tile.miss { background: #e6e9e4; }.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }.stats-grid div { padding: 15px 7px; background: var(--paper); border-radius: 10px; text-align: center; }.stats-grid strong, .stats-grid span { display: block; }.stats-grid strong { font-size: 24px; }.stats-grid span { margin-top: 4px; color: var(--muted); font-size: 10px; }
+@media (max-width: 520px) { .app-shell { width: min(100% - 24px, 920px); padding-top: 22px; }.site-header { padding-bottom: 38px; }.hero-copy { align-items: start; }.streak-card { display: none; }.game-card { padding: 22px 12px 18px; border-radius: 17px; }.keyboard { gap: 6px 3px; }.key { min-width: 27px; padding: 0 6px; height: 40px; }.key.wide { min-width: 50px; }.site-footer { font-size: 8px; } }
