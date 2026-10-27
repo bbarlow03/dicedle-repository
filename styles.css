@@ -212,7 +212,7 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
 .legend { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: #b0c0ba; font-size: 12px; }
 .legend-tile { display: grid; place-items: center; flex-shrink: 0; width: 28px; height: 28px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 6px; color: #15251e; font-family: "DM Mono", monospace; font-weight: 500; box-shadow: 0 3px 0 #060d10; }
 .legend-tile.exact { background: var(--mint); }
-.legend-tile.close { background: var(--gold); }
+.legend-tile.close { background: linear-gradient(145deg, #363638, #242426); color: var(--bust-red); border-color: var(--bust-red); }
 .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .stats-grid > div { padding: 15px 5px; border: 1px solid #35484e; border-radius: 12px; background: linear-gradient(145deg, #23343c, #142129); box-shadow: 0 4px 0 #070e12; text-align: center; }
 .stats-grid strong, .stats-grid span { display: block; }

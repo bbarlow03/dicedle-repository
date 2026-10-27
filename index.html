@@ -54,7 +54,7 @@
         <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">Every roll adds to your score. Seven ends the run.</div>
         <button class="test-restart-button" id="test-restart-button" hidden><span aria-hidden="true">↻</span> NEW TEST RUN</button>
         <div class="daily-status">
-          <p id="daily-message">One run per day. Your progress is saved in this browser.</p>
+          <p id="daily-message">One run per day. Make it count.</p>
           <p class="reset-label">NEXT RUN IN <time id="reset-countdown">--:--:--</time><span id="reset-note">A fresh chance tomorrow</span></p>
         </div>
       </section>
@@ -68,13 +68,13 @@
     <dialog class="modal welcome-modal" id="welcome-modal" aria-labelledby="welcome-title">
       <p class="eyebrow">WELCOME TO</p>
       <h2 id="welcome-title">Dicedle<span>.</span></h2>
-      <p class="welcome-odds">5 in 6 safe · 1 in 6 bust</p>
+      <p class="welcome-odds">how far can you go · till your luck runs dry?</p>
       <div class="welcome-copy">
-        <p>Tap <strong>ROLL</strong> to throw two dice. Each roll adds its total to your <strong>score</strong>. Keep rolling and see how high you can go.</p>
+        <p>Press <strong>ROLL</strong> to throw two dice. Each roll adds its total to your <strong>score</strong>. Keep rolling and see how high you can go.</p>
         <p>Roll a <strong>7</strong>? You get those <strong>7 points</strong>, then you <strong>bust</strong>. That's your final score.</p>
-        <p id="welcome-daily-rule"><strong>One run a day.</strong> Your next chance arrives <strong>tomorrow</strong>.</p>
+        <p id="welcome-daily-rule"><strong>One run</strong>, that's it. Your next chance arrives with the rise of a <strong>new day</strong>.</p>
       </div>
-      <p class="welcome-note">Your run is saved in this browser. Come back to finish an unfinished run, even after a refresh.</p>
+      <p class="welcome-note">Your run is saved in this browser. Come back to complete an unfinished run, if you dare.</p>
       <button class="welcome-play" id="welcome-play" autofocus>Roll to play →</button>
       <button class="welcome-rules" id="welcome-rules">Full rules</button>
     </dialog>
@@ -82,10 +82,10 @@
       <button class="modal-close" data-close-modal aria-label="Close">×</button>
       <p class="eyebrow">How to play</p>
       <h2 id="help-title">Make every roll count.</h2>
-      <p>Press ROLL to throw two dice. Every roll adds its total to your score. Roll a seven and you add 7 points, then bust immediately, ending the run with your updated score.</p>
+      <p>Press ROLL to throw two dice. Every roll adds its total to your score. Roll a seven and your run is instantly over. No revives, no second chances until a new day comes.</p>
       <div class="legend"><span class="legend-tile exact">+</span> Safe roll — added to your score</div>
       <div class="legend"><span class="legend-tile close">7</span> Add 7 points, then bust</div>
-      <p id="help-daily-rule">You get one run per day. Refreshing or reopening the site resumes your saved run. After a bust, come back the next day for a fresh run.</p>
+      <p id="help-daily-rule">You get one run per day. Refreshing or reopening the site resumes your saved run. After a bust, come back the next day for a fresh start.</p>
       <p>Progress is saved in this browser on this device.</p>
     </dialog>
     <dialog class="modal" id="stats-modal" aria-labelledby="stats-title">

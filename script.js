@@ -1,5 +1,5 @@
 // Temporarily disabled for testing. Set to true to restore one run per day.
-const dailyLimitEnabled = false;
+const dailyLimitEnabled = true;
 
 const dieOne = document.querySelector("#die-one");
 const dieTwo = document.querySelector("#die-two");
