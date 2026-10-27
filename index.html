@@ -28,43 +28,71 @@
 
       <section class="hero-copy" aria-labelledby="game-title">
         <div>
-          <p class="round-label">ROUND 0124 <span class="live-dot"></span></p>
-          <h2 id="game-title">Roll with it.</h2>
-          <p class="lede">Guess the hidden six-letter word in six tries. Every roll gives you a clue.</p>
+          <p class="round-label"><span id="daily-date">TODAY'S RUN</span> <span class="live-dot"></span></p>
+          <h2 id="game-title">Push your luck.</h2>
+          <p class="lede">Roll the dice and build your score. Hit seven and the run is over.</p>
         </div>
-        <div class="streak-card">
-          <span class="streak-icon">✦</span>
-          <div><strong>3</strong><small>day streak</small></div>
+        <div class="daily-badge">
+          <span class="daily-badge-icon" aria-hidden="true">↻</span>
+          <div><strong id="daily-badge-title">One run a day</strong><small id="daily-badge-caption">A fresh run tomorrow</small></div>
         </div>
       </section>
 
       <section class="game-card" aria-label="Dicedle game">
-        <div class="board" id="board" aria-live="polite"></div>
-        <div class="game-status" id="game-status">Make your first guess</div>
-        <div class="keyboard" id="keyboard" aria-label="On-screen keyboard"></div>
-        <button class="new-game-button" id="new-game-button">New roll <span>↻</span></button>
+        <div class="score-row">
+          <div class="score-plaque"><p class="eyebrow" id="score-label">CURRENT SCORE</p><div class="score" id="score">0</div></div>
+          <div class="rolls-plaque"><p class="eyebrow">ROLLS</p><div class="roll-count" id="roll-count">0</div></div>
+        </div>
+        <div class="bust-warning"><span class="warning-dot"></span> 7 = BUST</div>
+        <div class="dice-stage" role="group" aria-label="Dice">
+          <div class="die" id="die-one" data-value="1" role="img" aria-label="First die, waiting to roll"><span class="pip pip-1"></span><span class="pip pip-2"></span><span class="pip pip-3"></span><span class="pip pip-4"></span><span class="pip pip-5"></span><span class="pip pip-6"></span></div>
+          <div class="plus" aria-hidden="true">+</div>
+          <div class="die" id="die-two" data-value="1" role="img" aria-label="Second die, waiting to roll"><span class="pip pip-1"></span><span class="pip pip-2"></span><span class="pip pip-3"></span><span class="pip pip-4"></span><span class="pip pip-5"></span><span class="pip pip-6"></span></div>
+        </div>
+        <div class="roll-result" id="roll-result">Ready when you are</div>
+        <button class="roll-button" id="roll-button" aria-describedby="game-status"><span id="roll-button-label">ROLL</span><small id="roll-button-caption">take your chance</small></button>
+        <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">Every roll adds to your score. Seven ends the run.</div>
+        <button class="test-restart-button" id="test-restart-button" hidden><span aria-hidden="true">↻</span> NEW TEST RUN</button>
+        <div class="daily-status">
+          <p id="daily-message">One run per day. Your progress is saved in this browser.</p>
+          <p class="reset-label">NEXT RUN IN <time id="reset-countdown">--:--:--</time><span id="reset-note">A fresh chance tomorrow</span></p>
+        </div>
       </section>
 
       <footer class="site-footer">
-        <span>GUESS WITH INTENTION</span>
-        <span>ONE PUZZLE EVERY DAY</span>
+        <span>MAKE EVERY ROLL COUNT</span>
+        <span id="daily-footer">ONE RUN EVERY DAY</span>
       </footer>
     </main>
 
-    <dialog class="modal" id="help-modal">
+    <dialog class="modal welcome-modal" id="welcome-modal" aria-labelledby="welcome-title">
+      <p class="eyebrow">WELCOME TO</p>
+      <h2 id="welcome-title">Dicedle<span>.</span></h2>
+      <p class="welcome-odds">5 in 6 safe · 1 in 6 bust</p>
+      <div class="welcome-copy">
+        <p>Tap <strong>ROLL</strong> to throw two dice. Each roll adds its total to your <strong>score</strong>. Keep rolling and see how high you can go.</p>
+        <p>Roll a <strong>7</strong>? You get those <strong>7 points</strong>, then you <strong>bust</strong>. That's your final score.</p>
+        <p id="welcome-daily-rule"><strong>One run a day.</strong> Your next chance arrives <strong>tomorrow</strong>.</p>
+      </div>
+      <p class="welcome-note">Your run is saved in this browser. Come back to finish an unfinished run, even after a refresh.</p>
+      <button class="welcome-play" id="welcome-play" autofocus>Roll to play →</button>
+      <button class="welcome-rules" id="welcome-rules">Full rules</button>
+    </dialog>
+    <dialog class="modal" id="help-modal" aria-labelledby="help-title">
       <button class="modal-close" data-close-modal aria-label="Close">×</button>
       <p class="eyebrow">How to play</p>
-      <h2>Find the word.</h2>
-      <p>Type a six-letter word and press enter. Gold letters are in the word but in the wrong spot. Mint letters are exactly right.</p>
-      <div class="legend"><span class="legend-tile exact">A</span> Right letter, right place</div>
-      <div class="legend"><span class="legend-tile close">A</span> Right letter, wrong place</div>
-      <div class="legend"><span class="legend-tile miss">A</span> Not in the word</div>
+      <h2 id="help-title">Make every roll count.</h2>
+      <p>Press ROLL to throw two dice. Every roll adds its total to your score. Roll a seven and you add 7 points, then bust immediately, ending the run with your updated score.</p>
+      <div class="legend"><span class="legend-tile exact">+</span> Safe roll — added to your score</div>
+      <div class="legend"><span class="legend-tile close">7</span> Add 7 points, then bust</div>
+      <p id="help-daily-rule">You get one run per day. Refreshing or reopening the site resumes your saved run. After a bust, come back the next day for a fresh run.</p>
+      <p>Progress is saved in this browser on this device.</p>
     </dialog>
-    <dialog class="modal" id="stats-modal">
+    <dialog class="modal" id="stats-modal" aria-labelledby="stats-title">
       <button class="modal-close" data-close-modal aria-label="Close">×</button>
       <p class="eyebrow">Your run</p>
-      <h2>Keep the streak alive.</h2>
-      <div class="stats-grid"><div><strong>0</strong><span>Played</span></div><div><strong>0%</strong><span>Win rate</span></div><div><strong>3</strong><span>Current streak</span></div></div>
+      <h2 id="stats-title">Today's run.</h2>
+      <div class="stats-grid"><div><strong id="stat-rolls">0</strong><span>Rolls</span></div><div><strong id="stat-score">0</strong><span>Score</span></div><div><strong id="stat-status">Ready</strong><span>Status</span></div></div>
     </dialog>
     <script src="script.js"></script>
   </body>
