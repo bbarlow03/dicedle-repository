@@ -130,7 +130,7 @@ function renderGame() {
   } else if (busted) {
     const message = gameOverMessages[dailyRun.gameOverMessageIndex];
     status.textContent = typeof message === "string" ? message : gameOverMessages[0];
-    dailyMessage.textContent = "Today's run is complete. Come back tomorrow for a fresh start.";
+    dailyMessage.textContent = "Today's run is factum est. Come back tomorrow for another chance at glory.";
   } else if (lastRoll) {
     const message = safeRollMessages[dailyRun.safeRollMessageIndex];
     status.textContent = typeof message === "string" ? message : safeRollMessages[0];
