@@ -39,7 +39,7 @@ button:focus-visible { outline: 3px solid var(--mint); outline-offset: 6px; }
 h1, h2, p { margin-top: 0; }
 .app-shell { position: relative; width: min(100% - 40px, 940px); margin: 0 auto; padding: 26px 0 22px; }
 .site-header, .hero-copy, .site-footer { display: flex; align-items: center; justify-content: space-between; }
-.site-header { padding: 0 4px 24px; }
+.site-header { gap: 24px; padding: 0 4px 24px; }
 .brand-lockup { display: flex; align-items: center; gap: 13px; }
 .brand-mark { display: grid; grid-template-columns: repeat(3, 9px); gap: 5px; align-items: end; height: 29px; transform: rotate(-14deg); }
 .brand-mark span { width: 9px; height: 9px; background: var(--ink); border-radius: 50%; box-shadow: 0 3px 0 #050b0d; }
@@ -50,6 +50,13 @@ h1, h2, p { margin-top: 0; }
 h1 { margin: 0; font-size: 25px; line-height: 1; letter-spacing: -.06em; }
 .brand-dot { color: var(--mint); }
 .header-actions { display: flex; gap: 10px; }
+.account-icon svg { display: block; width: 19px; height: 19px; margin: auto; }
+.account-icon.is-signed-in { color: var(--mint); border-color: #528974; }
+.main-nav { display: flex; flex: 1; justify-content: center; gap: 8px; }
+.nav-link { padding: 12px 18px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font-family: "DM Mono", monospace; font-size: 11px; letter-spacing: .1em; text-decoration: none; }
+.nav-link:hover { border-color: #35484e; color: var(--ink); background: #152229; }
+.nav-link[aria-current="page"] { border-color: #477568; background: linear-gradient(145deg, #233b34, #152822); color: var(--mint); box-shadow: 0 4px 0 #07110d, inset 0 1px 0 rgba(255, 255, 255, .04); }
+.nav-link:focus-visible, .profile-play-link:focus-visible { outline: 3px solid var(--mint); outline-offset: 4px; border-radius: 8px; }
 .icon-button {
   width: 36px;
   height: 36px;
@@ -76,11 +83,9 @@ h1 { margin: 0; font-size: 25px; line-height: 1; letter-spacing: -.06em; }
 .live-dot { display: inline-block; width: 6px; height: 6px; margin-left: 5px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px rgba(138, 213, 189, .4); vertical-align: 1px; }
 h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; letter-spacing: -.065em; }
 .lede { max-width: 420px; margin-bottom: 0; color: var(--muted); line-height: 1.6; font-size: 13px; }
-.daily-badge { display: flex; align-items: center; flex-shrink: 0; gap: 10px; }
-.daily-badge-icon { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #4c4632; border-radius: 12px; background: linear-gradient(145deg, #383325, #23251f); color: var(--gold); font-size: 24px; box-shadow: 0 3px 0 #0a100f; }
-.daily-badge strong, .daily-badge small { display: block; }
-.daily-badge strong { font-size: 13px; font-weight: 500; }
-.daily-badge small { margin-top: 5px; color: var(--muted); font-size: 10px; }
+.game-hero { display: block; text-align: center; }
+.game-hero .round-label { margin-bottom: 18px; text-align: left; }
+.game-hero .lede { max-width: 580px; margin-inline: auto; }
 
 /* Each game piece has its own edge and shadow above the woven backdrop. */
 .game-card { max-width: 560px; margin: 0 auto; padding: 30px 12px 20px; text-align: center; }
@@ -190,11 +195,6 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
   0%, 65%, 100% { transform: translateY(0); opacity: .4; }
   32% { transform: translateY(-6px); opacity: 1; }
 }
-.test-restart-button { margin: 16px auto 0; padding: 11px 16px; border: 1px solid #3a5159; border-radius: 10px; background: linear-gradient(145deg, #23353d, #17252c); box-shadow: 0 4px 0 #070d12, inset 0 1px 0 rgba(255, 255, 255, .05); color: #c5d9d0; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .06em; cursor: pointer; transition: transform .12s ease; }
-.test-restart-button span { margin-right: 5px; font-size: 14px; }
-.test-restart-button:enabled:hover { border-color: var(--mint-dark); transform: translateY(-1px); }
-.test-restart-button:enabled:active { transform: translateY(3px); box-shadow: 0 1px 0 #070d12; }
-.test-restart-button:disabled { opacity: .6; cursor: wait; }
 .daily-status { max-width: 420px; margin: 24px auto 0; padding-top: 18px; border-top: 1px solid var(--line); }
 .daily-status p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.8; }
 .daily-status .reset-label { margin-top: 14px; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .04em; }
@@ -220,6 +220,118 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
 .stats-grid span { margin-top: 5px; color: var(--muted); font-size: 10px; }
 #stat-status { font-size: 17px; line-height: 2; }
 
+/* Profile records share the game's raised surfaces. */
+.profile-local-badge { flex-shrink: 0; padding: 9px 11px; border: 1px solid #36504e; border-radius: 8px; background: #14242a; color: #a3beb4; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .07em; }
+.profile-error { padding: 14px 18px; border: 1px solid #725b38; border-radius: 10px; background: #2a241b; color: var(--gold); font-size: 12px; line-height: 1.7; }
+.profile-records { margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.profile-metric { min-width: 0; padding: 20px; border: 1px solid #35484e; border-radius: 16px; background: linear-gradient(145deg, #203039, #121d23); box-shadow: var(--shadow); }
+.profile-metric .eyebrow { margin-bottom: 14px; font-size: 9px; line-height: 1.5; letter-spacing: .08em; }
+.profile-metric > strong { display: block; min-height: 53px; color: var(--mint); font-size: 42px; line-height: 1.2; letter-spacing: -.05em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.profile-metric > p:last-child { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.profile-lifetime { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; padding: 24px 0 4px; color: var(--muted); font-size: 11px; }
+.profile-lifetime strong { margin-right: 5px; color: var(--ink); font-family: "DM Mono", monospace; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.profile-panel { margin-top: 24px; padding: 24px; border: 1px solid #2e4248; border-radius: 18px; background: linear-gradient(145deg, #18262d, #101b21); box-shadow: var(--shadow); }
+.profile-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.profile-panel-header .eyebrow { margin-bottom: 7px; font-size: 9px; }
+.profile-panel h3 { margin: 0; font-size: 23px; line-height: 1.2; letter-spacing: -.04em; font-weight: 500; }
+.profile-play-link { flex-shrink: 0; padding: 5px 0; color: var(--mint); font-size: 12px; text-decoration: none; }
+.profile-play-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.profile-today-stats { gap: 14px; }
+.profile-today-stats strong { font-size: 32px; line-height: 1.3; }
+.profile-today-stats #stat-status { font-size: 18px; line-height: 42px; }
+.profile-roll-label { margin: 24px 0 12px; font-size: 9px; }
+.profile-rolls { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.profile-roll { padding: 7px 10px; border: 1px solid #35534b; border-radius: 7px; background: #182b26; box-shadow: 0 2px 0 #080f0c; color: #b6d8c8; font-family: "DM Mono", monospace; font-size: 11px; }
+.profile-roll.is-bust { border-color: #683a44; background: #291a22; color: var(--bust-red); }
+.profile-today-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.history-count { padding: 7px 9px; border: 1px solid #30464c; border-radius: 7px; background: #1a2b31; color: var(--muted); font-family: "DM Mono", monospace; font-size: 10px; white-space: nowrap; }
+.history-empty { padding: 26px 10px 30px; text-align: center; }
+.history-empty > span { display: block; margin-bottom: 12px; color: var(--mint); font-size: 32px; }
+.history-empty h4 { margin: 0 0 8px; font-size: 21px; font-weight: 500; letter-spacing: -.03em; }
+.history-empty p { margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.history-table-wrap { overflow-x: auto; }
+.history-table { width: 100%; border-collapse: collapse; text-align: left; }
+.history-table th { padding: 0 12px 13px; border-bottom: 1px solid #35484e; color: var(--muted); font-family: "DM Mono", monospace; font-size: 9px; font-weight: 400; letter-spacing: .09em; text-transform: uppercase; }
+.history-table td { padding: 15px 12px; border-bottom: 1px solid #25383f; color: #c4d2ca; font-size: 12px; }
+.history-table th:first-child, .history-table td:first-child { padding-left: 0; }
+.history-table th:last-child, .history-table td:last-child { padding-right: 0; text-align: right; }
+.history-table th:nth-child(2), .history-table th:nth-child(3), .history-table .history-number { text-align: right; }
+.history-table .history-number { font-family: "DM Mono", monospace; font-size: 13px; font-variant-numeric: tabular-nums; }
+.history-table td:nth-child(2) { color: var(--mint); }
+.history-outcome { display: inline-block; padding: 5px 8px; border: 1px solid #3b4e51; border-radius: 6px; background: #1d2d32; color: #b1c3bc; font-family: "DM Mono", monospace; font-size: 9px; white-space: nowrap; }
+.history-outcome.busted { border-color: #613440; background: #281a21; color: var(--bust-red); }
+.history-outcome.in-progress { border-color: #3b6552; background: #182d23; color: var(--mint); }
+.history-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.history-pagination p { margin: 0; color: var(--muted); font-size: 11px; }
+.history-pagination > div { display: flex; gap: 8px; }
+.history-page-button { width: 36px; height: 32px; padding: 0; border: 1px solid #3a5159; border-radius: 8px; background: linear-gradient(145deg, #23353d, #17252c); box-shadow: 0 3px 0 #070d12; color: var(--mint); cursor: pointer; }
+.history-page-button:enabled:hover { border-color: var(--mint); }
+.history-page-button:enabled:active { transform: translateY(2px); box-shadow: 0 1px 0 #070d12; }
+.history-page-button:disabled { opacity: .35; cursor: default; }
+.profile-history-note { margin: 18px 0 0; color: #819995; font-size: 11px; line-height: 1.7; }
+.profile-storage-note { margin: 24px 0 18px; color: var(--muted); font-size: 11px; line-height: 1.7; text-align: center; }
+.profile-account { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 24px; padding: 18px 20px; border: 1px solid #31494a; border-radius: 14px; background: #142127; }
+.profile-account > div { min-width: 0; }
+.profile-account p { margin: 0; color: #b0c0ba; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.profile-account #profile-account-status { margin-top: 5px; color: var(--muted); font-size: 11px; }
+.account-action { padding: 11px 14px; border: 1px solid #3e6158; border-radius: 9px; background: linear-gradient(145deg, #263a35, #192b25); box-shadow: 0 3px 0 #080f0c; color: var(--mint); font-size: 12px; cursor: pointer; }
+.account-action:hover:enabled { border-color: var(--mint); }
+.account-action:active:enabled { transform: translateY(2px); box-shadow: 0 1px 0 #080f0c; }
+.account-action:disabled { opacity: .5; cursor: default; }
+.profile-account .account-action { flex-shrink: 0; }
+.account-modal { width: min(calc(100% - 28px), 460px); }
+.account-modal h2 { max-width: 300px; }
+.account-modal label { display: block; margin: 22px 0 8px; color: var(--ink); font-size: 12px; }
+.account-modal input { width: 100%; padding: 13px 12px; border: 1px solid #415950; border-radius: 8px; background: #0e191e; color: var(--ink); font: inherit; font-size: 15px; }
+.account-modal input:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.account-primary { width: 100%; margin-top: 14px; }
+.account-actions { display: flex; flex-direction: column; gap: 12px; }
+.account-modal .account-note { margin-top: 18px; font-size: 11px; color: var(--muted); }
+.account-email { overflow-wrap: anywhere; font-family: "DM Mono", monospace; }
+.account-modal .account-status { margin: 22px 0 0; padding: 12px; border: 1px solid #344b47; border-radius: 8px; background: #11201d; color: #bcd6c8; font-size: 12px; }
+.account-dismiss { display: block; margin: 16px auto 0; padding: 8px; border: 0; background: none; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+@media (max-width: 560px) {
+  .profile-account { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px; }
+  .profile-account .account-action { align-self: flex-start; }
+}
+#profile-title:focus, #game-title:focus { outline: none; }
+
+/* Centered play stack, with personal bests beside the current run counters. */
+body.is-play-page { --play-die-size: clamp(88px, 10.4dvh, 112px); }
+.is-play-page .app-shell { display: flex; flex-direction: column; min-height: 100dvh; padding-block: 16px; }
+.is-play-page .site-header { padding-bottom: 20px; }
+.is-play-page #play-page { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.is-play-page .game-hero { padding: 20px 28px; }
+.is-play-page .game-hero .round-label { margin-bottom: 10px; font-size: 10px; }
+.is-play-page .game-hero h2 { margin-bottom: 10px; font-size: clamp(36px, 4.4dvh, 48px); }
+.is-play-page .game-hero .lede { font-size: 13px; line-height: 1.5; }
+.is-play-page .game-card { display: flex; flex-direction: column; align-items: center; width: min(100%, 560px); margin-block: auto; padding: 26px 12px 24px; }
+.is-play-page .score-row { align-items: stretch; justify-content: center; flex-direction: row; gap: 16px; margin: 0 0 18px; }
+.is-play-page .score-plaque { min-width: 176px; padding: 14px 20px; }
+.is-play-page .rolls-plaque { min-width: 144px; padding: 14px 18px; }
+.is-play-page .score-row .eyebrow { margin-bottom: 8px; font-size: 9px; }
+.is-play-page .score { font-size: clamp(46px, 5.6dvh, 64px); }
+.is-play-page .roll-count { font-size: clamp(38px, 5dvh, 54px); line-height: 1.12; }
+.is-play-page .play-best { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; white-space: nowrap; }
+.is-play-page .play-best strong { margin-left: 3px; color: #d0e2d7; font-family: "DM Mono", monospace; font-weight: 500; font-variant-numeric: tabular-nums; }
+.is-play-page .bust-warning { padding: 5px 10px; }
+.is-play-page .dice-stage { gap: 22px; min-height: calc(var(--play-die-size) + 24px); margin-top: 18px; }
+.is-play-page .die { width: var(--play-die-size); height: var(--play-die-size); border-radius: 21px; }
+.is-play-page .pip { width: calc(var(--play-die-size) * .15); height: calc(var(--play-die-size) * .15); }
+.is-play-page .plus { font-size: 24px; }
+.is-play-page .roll-result { min-width: 150px; margin: 12px auto 26px; padding: 6px 12px; font-size: 11px; line-height: 1.4; }
+.is-play-page .roll-button { width: min(100%, 260px); height: 84px; padding: 12px; }
+.is-play-page .roll-button span { font-size: 28px; }
+.is-play-page .roll-button.is-busted span { font-size: 32px; }
+.is-play-page .roll-button small { margin-top: 5px; }
+.is-play-page .game-status { min-height: 20px; margin: 24px 0 0; font-size: 12px; line-height: 1.6; }
+.is-play-page .daily-status { width: 100%; max-width: 560px; margin: 22px 0 0; padding-top: 14px; }
+.is-play-page .daily-status p { font-size: 11px; line-height: 1.6; }
+.is-play-page .daily-status .reset-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; margin-top: 10px; font-size: 9px; }
+.is-play-page .reset-label time { margin: 0; padding: 4px 9px; font-size: 15px; line-height: 1.4; }
+.is-play-page .reset-label span { margin: 0; font-size: 9px; }
+.is-play-page .site-footer { padding-top: 6px; }
+
 .welcome-modal { width: min(calc(100% - 28px), 525px); padding: 34px 32px 28px; text-align: center; }
 .welcome-modal[open] { animation: welcome-in .2s ease-out; }
 #welcome-modal .eyebrow { color: #a8b8b6; font-size: 12px; letter-spacing: .18em; }
@@ -244,11 +356,138 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
   .brand-lockup { gap: 10px; }
   .brand-lockup .eyebrow { font-size: 8px; }
   .hero-copy { padding: 22px; border-radius: 18px; }
-  .daily-badge { display: none; }
   .game-card { padding: 26px 4px 18px; }
   .dice-stage { gap: 20px; min-height: 126px; }
   .die { width: 94px; height: 94px; border-radius: 18px; }
   .pip { width: 14px; height: 14px; }
   .welcome-modal { padding: 28px 22px 24px; }
   .site-footer { font-size: 7px; letter-spacing: .08em; }
+  .site-header { flex-wrap: wrap; gap: 16px; }
+  .brand-lockup { flex: 1; }
+  .main-nav { order: 3; flex-basis: 100%; gap: 10px; }
+  .nav-link { flex: 1; padding: 12px; text-align: center; }
+  .profile-local-badge { display: none; }
+  .profile-records { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .profile-metric { padding: 16px; }
+  .profile-metric > strong { min-height: 44px; font-size: 36px; }
+  .profile-lifetime { gap: 12px; font-size: 10px; }
+  .profile-lifetime strong { font-size: 12px; }
+  .profile-panel { margin-top: 20px; padding: 18px; }
+  .profile-panel h3 { font-size: 21px; }
+  .profile-panel-header { gap: 12px; }
+  .profile-play-link { font-size: 10px; }
+  .profile-today-stats { gap: 8px; }
+  .history-table th { font-size: 8px; }
+  .history-table td { font-size: 10px; }
+  .history-table th, .history-table td { padding-left: 5px; padding-right: 5px; }
+  .history-table .history-number { font-size: 11px; }
+  .history-outcome { padding: 5px; font-size: 8px; }
+}
+
+@media (max-height: 950px) {
+  body.is-play-page { --play-die-size: clamp(78px, 10dvh, 96px); }
+  .is-play-page .app-shell { padding-block: 12px; }
+  .is-play-page .site-header { padding-bottom: 14px; }
+  .is-play-page .game-hero { padding: 16px 24px; }
+  .is-play-page .game-hero .round-label { margin-bottom: 8px; font-size: 9px; }
+  .is-play-page .game-hero h2 { margin-bottom: 8px; font-size: clamp(32px, 4.4dvh, 42px); }
+  .is-play-page .game-hero .lede { font-size: 12px; line-height: 1.4; }
+  .is-play-page .game-card { padding: 18px 12px 14px; }
+  .is-play-page .score-row { margin-bottom: 14px; }
+  .is-play-page .score-plaque, .is-play-page .rolls-plaque { padding: 10px 18px; }
+  .is-play-page .score-row .eyebrow { margin-bottom: 6px; }
+  .is-play-page .score { font-size: clamp(42px, 5.2dvh, 52px); }
+  .is-play-page .roll-count { font-size: clamp(36px, 4.65dvh, 46px); }
+  .is-play-page .play-best { margin-top: 8px; font-size: 10px; }
+  .is-play-page .dice-stage { min-height: calc(var(--play-die-size) + 22px); margin-top: 14px; }
+  .is-play-page .roll-result { margin: 10px auto 20px; padding: 4px 10px; font-size: 10px; }
+  .is-play-page .roll-button { height: 76px; padding: 10px; }
+  .is-play-page .roll-button span { font-size: 26px; }
+  .is-play-page .roll-button.is-busted span { font-size: 30px; }
+  .is-play-page .roll-button small { margin-top: 4px; }
+  .is-play-page .game-status { min-height: 18px; margin-top: 20px; font-size: 11px; }
+  .is-play-page .daily-status { margin-top: 16px; padding-top: 10px; }
+  .is-play-page .daily-status .reset-label { margin-top: 8px; gap: 4px 8px; font-size: 8px; }
+  .is-play-page .reset-label time { padding: 3px 7px; font-size: 13px; }
+  .is-play-page .reset-label span { font-size: 8px; }
+}
+
+@media (max-width: 560px) {
+  .is-play-page .app-shell { padding-block: 10px; }
+  .is-play-page .site-header { flex-wrap: nowrap; gap: 8px; padding-bottom: 12px; }
+  .is-play-page .brand-lockup { flex: 0 1 auto; gap: 8px; }
+  .is-play-page .brand-lockup .eyebrow { font-size: 7px; letter-spacing: .06em; }
+  .is-play-page h1 { font-size: 22px; }
+  .is-play-page .brand-mark { grid-template-columns: repeat(3, 7px); gap: 4px; height: 24px; }
+  .is-play-page .brand-mark span { width: 7px; }
+  .is-play-page .main-nav { order: 0; flex-basis: auto; gap: 4px; }
+  .is-play-page .nav-link { flex: 0 1 auto; padding: 9px 8px; font-size: 10px; letter-spacing: .04em; }
+  .is-play-page .icon-button { width: 34px; height: 34px; }
+  .is-play-page .header-actions { gap: 6px; }
+  .is-play-page .game-hero { padding: 12px 18px; }
+  .is-play-page .game-card { padding: 14px 4px 10px; }
+  .is-play-page .score-row { gap: 12px; margin-bottom: 12px; }
+  .is-play-page .score-plaque, .is-play-page .rolls-plaque { width: clamp(120px, 36vw, 154px); min-width: 0; padding-inline: 12px; }
+  .is-play-page .dice-stage { gap: 18px; margin-top: 12px; }
+  .is-play-page .roll-result { margin-top: 8px; margin-bottom: 18px; }
+  .is-play-page .game-status { margin-top: 18px; }
+  .is-play-page .daily-status { margin-top: 12px; }
+}
+
+@media (max-height: 780px) {
+  body.is-play-page { --play-die-size: clamp(68px, 10.5dvh, 84px); }
+  .is-play-page .app-shell { padding-block: 8px; }
+  .is-play-page .site-header { padding-bottom: 10px; }
+  .is-play-page .game-hero { padding: 10px 20px; }
+  .is-play-page .game-hero .round-label { margin-bottom: 6px; }
+  .is-play-page .game-hero h2 { margin-bottom: 6px; font-size: 32px; }
+  .is-play-page .game-hero .lede { font-size: 11.5px; line-height: 1.4; }
+  .is-play-page .game-card { padding-block: 10px 8px; }
+  .is-play-page .score-row { margin-bottom: 8px; }
+  .is-play-page .score-plaque, .is-play-page .rolls-plaque { padding-block: 8px; }
+  .is-play-page .score-row .eyebrow { margin-bottom: 4px; font-size: 8px; }
+  .is-play-page .score { font-size: 38px; }
+  .is-play-page .roll-count { font-size: 34px; }
+  .is-play-page .play-best { margin-top: 6px; font-size: 9.5px; }
+  .is-play-page .bust-warning { padding: 3px 8px; font-size: 8.5px; }
+  .is-play-page .dice-stage { min-height: calc(var(--play-die-size) + 18px); margin-top: 10px; }
+  .is-play-page .roll-result { margin: 6px auto 12px; }
+  .is-play-page .roll-button { height: 64px; padding: 8px; }
+  .is-play-page .roll-button span { font-size: 24px; }
+  .is-play-page .roll-button.is-busted span { font-size: 28px; }
+  .is-play-page .roll-button small { margin-top: 3px; }
+  .is-play-page .game-status { min-height: 17px; margin-top: 16px; line-height: 1.5; }
+  .is-play-page .daily-status { margin-top: 10px; padding-top: 8px; }
+  .is-play-page .daily-status p { font-size: 10px; line-height: 1.5; }
+  .is-play-page .daily-status .reset-label { margin-top: 6px; font-size: 8px; }
+  .is-play-page .site-footer { padding-top: 4px; }
+}
+
+@media (max-height: 700px) {
+  body.is-play-page { --play-die-size: clamp(60px, 10dvh, 72px); }
+  .is-play-page .app-shell { padding-block: 6px; }
+  .is-play-page .site-header { padding-bottom: 8px; }
+  .is-play-page .game-hero { padding-block: 8px; }
+  .is-play-page .game-hero .round-label { margin-bottom: 4px; }
+  .is-play-page .game-hero h2 { margin-bottom: 4px; font-size: 28px; }
+  .is-play-page .game-hero .lede { font-size: 11px; }
+  .is-play-page .game-card { padding-block: 8px 6px; }
+  .is-play-page .score-row { margin-bottom: 6px; }
+  .is-play-page .score-plaque, .is-play-page .rolls-plaque { padding-block: 6px; }
+  .is-play-page .score-row .eyebrow { margin-bottom: 3px; }
+  .is-play-page .score { font-size: 34px; }
+  .is-play-page .roll-count { font-size: 30px; }
+  .is-play-page .play-best { margin-top: 4px; font-size: 9px; }
+  .is-play-page .dice-stage { margin-top: 8px; }
+  .is-play-page .roll-result { margin: 4px auto 8px; }
+  .is-play-page .game-status { margin-top: 12px; }
+  .is-play-page .daily-status { margin-top: 6px; padding-top: 4px; }
+  .is-play-page .daily-status .reset-label { margin-top: 5px; }
+}
+
+@media (max-width: 360px) {
+  .is-play-page h1 { font-size: 20px; }
+  .is-play-page .icon-button { width: 32px; height: 32px; }
+  .is-play-page .brand-mark { display: none; }
+  .is-play-page .brand-lockup .eyebrow { font-size: 6px; }
 }

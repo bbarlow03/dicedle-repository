@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="is-play-page">
     <main class="app-shell">
       <header class="site-header">
         <div class="brand-lockup">
@@ -20,28 +20,37 @@
             <h1>DICEDLE<span class="brand-dot">.</span></h1>
           </div>
         </div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a class="nav-link" id="play-link" href="#play" aria-current="page">PLAY</a>
+          <a class="nav-link" id="profile-link" href="#profile">PROFILE</a>
+        </nav>
         <div class="header-actions">
+          <button class="icon-button account-icon" id="account-button" data-open-account aria-label="Sign in or create an account" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></button>
           <button class="icon-button" id="help-button" aria-label="How to play">?</button>
-          <button class="icon-button" id="stats-button" aria-label="View stats">↗</button>
         </div>
       </header>
 
-      <section class="hero-copy" aria-labelledby="game-title">
+      <section id="play-page" aria-label="Play Dicedle">
+      <section class="hero-copy game-hero" aria-labelledby="game-title">
         <div>
           <p class="round-label"><span id="daily-date">TODAY'S RUN</span> <span class="live-dot"></span></p>
-          <h2 id="game-title">Push your luck.</h2>
-          <p class="lede">Roll the dice and build your score. Hit seven and the run is over.</p>
-        </div>
-        <div class="daily-badge">
-          <span class="daily-badge-icon" aria-hidden="true">↻</span>
-          <div><strong id="daily-badge-title">One run a day</strong><small id="daily-badge-caption">A fresh run tomorrow</small></div>
+          <h2 id="game-title">Test your luck.</h2>
+          <p class="lede">Roll the dice and stack your score. Hit seven and the run is over.</p>
         </div>
       </section>
 
       <section class="game-card" aria-label="Dicedle game">
         <div class="score-row">
-          <div class="score-plaque"><p class="eyebrow" id="score-label">CURRENT SCORE</p><div class="score" id="score">0</div></div>
-          <div class="rolls-plaque"><p class="eyebrow">ROLLS</p><div class="roll-count" id="roll-count">0</div></div>
+          <div class="score-plaque">
+            <p class="eyebrow" id="score-label">CURRENT SCORE</p>
+            <div class="score" id="score">0</div>
+            <p class="play-best">Best: <strong id="play-best-score">0</strong></p>
+          </div>
+          <div class="rolls-plaque">
+            <p class="eyebrow">ROLLS</p>
+            <div class="roll-count" id="roll-count">0</div>
+            <p class="play-best">Best: <strong id="play-best-streak">0</strong></p>
+          </div>
         </div>
         <div class="bust-warning"><span class="warning-dot"></span> 7 = BUST</div>
         <div class="dice-stage" role="group" aria-label="Dice">
@@ -52,11 +61,68 @@
         <div class="roll-result" id="roll-result">Ready when you are</div>
         <button class="roll-button" id="roll-button" aria-describedby="game-status"><span id="roll-button-label">ROLL</span><small id="roll-button-caption">take your chance</small></button>
         <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">Every roll adds to your score. Seven ends the run.</div>
-        <button class="test-restart-button" id="test-restart-button" hidden><span aria-hidden="true">↻</span> NEW TEST RUN</button>
-        <div class="daily-status">
+        <div class="daily-status" id="daily-status" hidden>
           <p id="daily-message">One run per day. Make it count.</p>
           <p class="reset-label">NEXT RUN IN <time id="reset-countdown">--:--:--</time><span id="reset-note">A fresh chance tomorrow</span></p>
         </div>
+      </section>
+
+      </section>
+      <section class="profile-page" id="profile-page" aria-labelledby="profile-title" hidden>
+        <header class="hero-copy profile-hero">
+          <div>
+            <p class="round-label">YOUR RECORD BOOK</p>
+            <h2 id="profile-title" tabindex="-1">Your profile.</h2>
+            <p class="lede">The good rolls. The close calls. Every run, remembered.</p>
+          </div>
+          <span class="profile-local-badge" id="profile-save-badge">SAVED ON THIS DEVICE</span>
+        </header>
+
+        <section class="profile-account" aria-label="Your account">
+          <div><p id="profile-account-copy">Play as a guest, or sign in with your email to keep your scores across devices.</p><p id="profile-account-status" role="status">Guest scores stay in this browser.</p></div>
+          <button class="account-action" id="profile-account-action" data-open-account aria-haspopup="dialog">Sign in / create account</button>
+        </section>
+        <p class="profile-error" id="profile-error" role="status" hidden></p>
+
+        <section class="profile-records" aria-label="Personal records">
+          <article class="profile-metric"><p class="eyebrow">BEST SCORE</p><strong id="profile-best-score">—</strong><p>Highest total in a run</p></article>
+          <article class="profile-metric"><p class="eyebrow">MOST ROLLS</p><strong id="profile-best-rolls">—</strong><p>Your longest run</p></article>
+          <article class="profile-metric"><p class="eyebrow">RUNS PLAYED</p><strong id="profile-runs-played">0</strong><p>Every first roll counts</p></article>
+          <article class="profile-metric"><p class="eyebrow">AVERAGE FINAL SCORE</p><strong id="profile-average-score">—</strong><p id="profile-average-note">No finished runs yet</p></article>
+        </section>
+        <div class="profile-lifetime" aria-label="Lifetime totals">
+          <span><strong id="profile-total-rolls">0</strong> total rolls</span>
+          <span><strong id="profile-total-score">0</strong> points earned</span>
+          <span><strong id="profile-days-played">0</strong> days played</span>
+        </div>
+
+        <section class="profile-panel" aria-labelledby="today-run-title">
+          <header class="profile-panel-header">
+            <div><p class="eyebrow" id="profile-today-date">TODAY</p><h3 id="today-run-title">Today's run.</h3></div>
+            <a class="profile-play-link" id="profile-play-link" href="#play">Roll to play →</a>
+          </header>
+          <div class="stats-grid profile-today-stats">
+            <div><strong id="stat-score">0</strong><span>Score</span></div>
+            <div><strong id="stat-rolls">0</strong><span>Rolls</span></div>
+            <div><strong id="stat-status">Ready</strong><span>Status</span></div>
+          </div>
+          <p class="profile-roll-label eyebrow">ROLL BY ROLL</p>
+          <ol class="profile-rolls" id="profile-today-rolls" aria-label="Today's dice rolls"></ol>
+          <p class="profile-today-note" id="profile-today-note">Your first roll starts today's story.</p>
+        </section>
+
+        <section class="profile-panel history-panel" aria-labelledby="history-title">
+          <header class="profile-panel-header"><div><p class="eyebrow">THE PAPER TRAIL</p><h3 id="history-title">Run history.</h3></div><span class="history-count" id="history-count">0 runs</span></header>
+          <div class="history-empty" id="history-empty"><span aria-hidden="true">✦</span><h4>No runs on record. Yet.</h4><p>Your first roll gets the story started.</p><a class="profile-play-link" href="#play">Make your first roll →</a></div>
+          <div id="history-results" hidden>
+            <div class="history-table-wrap">
+              <table class="history-table"><caption class="sr-only">Saved run results, newest first</caption><thead><tr><th scope="col">Date</th><th scope="col">Score</th><th scope="col">Rolls</th><th scope="col">Result</th></tr></thead><tbody id="history-rows"></tbody></table>
+            </div>
+            <div class="history-pagination"><p id="history-page-summary">0 runs</p><div><button class="history-page-button" id="history-previous" aria-label="Previous history page">←</button><button class="history-page-button" id="history-next" aria-label="Next history page">→</button></div></div>
+          </div>
+          <p class="profile-history-note">In-progress runs count toward personal bests. Average scores include finished runs only.</p>
+        </section>
+        <p class="profile-storage-note" id="profile-storage-note">Your daily records are saved in this browser, ready when you return.</p>
       </section>
 
       <footer class="site-footer">
@@ -74,7 +140,7 @@
         <p>Roll a <strong>7</strong>? You get those <strong>7 points</strong>, then you <strong>bust</strong>. That's your final score.</p>
         <p id="welcome-daily-rule"><strong>One run</strong>, that's it. Your next chance arrives with the rise of a <strong>new day</strong>.</p>
       </div>
-      <p class="welcome-note">Your run is saved in this browser. Come back to complete an unfinished run, if you dare.</p>
+      <p class="welcome-note">Your run is saved in this browser. Want to keep it across devices? You can sign in from your profile whenever you like.</p>
       <button class="welcome-play" id="welcome-play" autofocus>Roll to play →</button>
       <button class="welcome-rules" id="welcome-rules">Full rules</button>
     </dialog>
@@ -86,14 +152,32 @@
       <div class="legend"><span class="legend-tile exact">+</span> Safe roll — added to your score</div>
       <div class="legend"><span class="legend-tile close">7</span> Add 7 points, then bust</div>
       <p id="help-daily-rule">You get one run per day. Refreshing or reopening the site resumes your saved run. After a bust, come back the next day for a fresh start.</p>
-      <p>Progress is saved in this browser on this device.</p>
+      <p>Guest progress is saved in this browser. Sign in from your profile to save your scores to an account and resume on another device.</p>
     </dialog>
-    <dialog class="modal" id="stats-modal" aria-labelledby="stats-title">
-      <button class="modal-close" data-close-modal aria-label="Close">×</button>
-      <p class="eyebrow">Your run</p>
-      <h2 id="stats-title">Today's run.</h2>
-      <div class="stats-grid"><div><strong id="stat-rolls">0</strong><span>Rolls</span></div><div><strong id="stat-score">0</strong><span>Score</span></div><div><strong id="stat-status">Ready</strong><span>Status</span></div></div>
+    <dialog class="modal account-modal" id="account-modal" aria-labelledby="account-title" aria-describedby="account-status">
+      <button class="modal-close" data-close-modal aria-label="Close account dialog">×</button>
+      <p class="eyebrow">YOUR DICEDLE ACCOUNT</p>
+      <h2 id="account-title">Keep your lucky rolls.</h2>
+      <div id="account-guest">
+        <p>Create an account or sign in with your email. Keep your best scores, history, and today's run with you on any device.</p>
+        <form id="account-form">
+          <label for="account-email">Email address</label>
+          <input id="account-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required />
+          <button class="account-action account-primary" id="account-send" type="submit">Email me a sign-in link</button>
+        </form>
+        <p class="account-note">No password to remember. New here? The link creates your account after you confirm your email. You can always keep playing as a guest.</p>
+      </div>
+      <div id="account-member" hidden>
+        <p class="account-email" id="account-email-display"></p>
+        <p>Your account keeps its own record book. You can also add the guest scores saved in this browser. If a day is already saved to your account, that run takes priority.</p>
+        <div class="account-actions"><button class="account-action account-primary" id="account-sync">Sync scores</button><button class="account-action" id="account-import">Save this device's guest scores</button><button class="account-action" id="account-sign-out">Sign out</button></div>
+      </div>
+      <p class="account-status" id="account-status" role="status" aria-live="polite"></p>
+      <button class="account-dismiss" data-close-modal>Back to Dicedle</button>
     </dialog>
+    <script src="config.js"></script>
+    <script src="history.js"></script>
+    <script src="account.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
