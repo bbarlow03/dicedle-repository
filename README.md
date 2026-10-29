@@ -6,6 +6,17 @@ A small dice risk game built with HTML, CSS, and JavaScript. Optional email acco
 
 Open `index.html` in a browser, or serve the folder with any static file server.
 
+## Site icons
+
+`favicon.svg` is the source for Dicedle's mint dice icon. `favicon.ico` includes
+16, 32, and 48 pixel versions for browser tabs and bookmarks. The `icons/` folder
+contains PNG icons for browser fallbacks, Apple home-screen shortcuts, and web
+app icons, including a version with extra padding for device icon masks.
+`index.html` and `site.webmanifest` reference these assets with relative paths
+so they also work when the site is served from a GitHub Pages subdirectory.
+Publish the icon files and manifest alongside the HTML. Browsers may cache an
+older tab icon; a fresh tab or browser restart can help show the update.
+
 ## Current foundation
 
 - Responsive game shell and visual identity
