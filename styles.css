@@ -281,11 +281,23 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
 .profile-account .account-action { flex-shrink: 0; }
 .account-modal { width: min(calc(100% - 28px), 460px); }
 .account-modal h2 { max-width: 300px; }
-.account-modal label { display: block; margin: 22px 0 8px; color: var(--ink); font-size: 12px; }
-.account-modal input { width: 100%; padding: 13px 12px; border: 1px solid #415950; border-radius: 8px; background: #0e191e; color: var(--ink); font: inherit; font-size: 15px; }
+.account-modal label { display: block; margin: 16px 0 6px; color: var(--ink); font-size: 12px; }
+.account-modal input { width: 100%; padding: 11px 12px; border: 1px solid #415950; border-radius: 8px; background: #0e191e; color: var(--ink); font: inherit; font-size: 15px; }
 .account-modal input:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 .account-primary { width: 100%; margin-top: 14px; }
 .account-actions { display: flex; flex-direction: column; gap: 12px; }
+.account-tabs { display: flex; gap: 8px; margin: 0 0 18px; }
+.account-tabs button { flex: 1; padding: 11px 8px; border: 1px solid #3b514c; border-radius: 8px; background: #12211e; color: var(--muted); cursor: pointer; font: inherit; font-size: 12px; }
+.account-tabs button[aria-pressed="true"] { border-color: var(--mint); background: #223c32; color: var(--mint); }
+.account-auth-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; }
+.account-auth-links button { border: 0; padding: 4px 0; background: none; color: var(--mint); text-decoration: underline; text-underline-offset: 4px; font: inherit; font-size: 11px; cursor: pointer; }
+.account-modal .account-field-hint { margin: 7px 0 0; font-size: 11px; color: var(--muted); }
+.account-modal .account-username-display { margin-bottom: 4px; color: var(--mint); font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+.account-settings { margin: 18px 0; border: 1px solid #344b47; border-radius: 9px; padding: 12px; }
+.account-settings summary { color: var(--mint); cursor: pointer; font-size: 12px; }
+.account-settings-form { margin: 16px 0 0; }
+.account-settings-form > p:first-child { margin-bottom: 0; }
+.account-modal button:disabled { opacity: .5; cursor: default; }
 .account-modal .account-note { margin-top: 18px; font-size: 11px; color: var(--muted); }
 .account-email { overflow-wrap: anywhere; font-family: "DM Mono", monospace; }
 .account-modal .account-status { margin: 22px 0 0; padding: 12px; border: 1px solid #344b47; border-radius: 8px; background: #11201d; color: #bcd6c8; font-size: 12px; }

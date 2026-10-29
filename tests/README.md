@@ -14,6 +14,7 @@ const harness = await fetch("tests/accounts.browser.js").then(r => r.text());
 await runDicedleAccountChecks(
   await fetch("supabase/schema.sql").then(r => r.text()),
   await fetch("supabase/tests/accounts.sql").then(r => r.text()),
+  await fetch("supabase/tests/usernames.sql").then(r => r.text()),
 );
 ```
 
@@ -22,8 +23,13 @@ immutable busts, separate account caches, explicit guest import, switching
 accounts, fresh-device restoration, offline rolls, and lost save responses.
 The PostgreSQL engine loads from jsDelivr for this check only.
 
+The harness also checks username uniqueness and permissions, signup without an
+active session, blocked sign-in before email confirmation, incorrect passwords,
+confirmation resend, password recovery, legacy account upgrades, and password
+fields/storage. Auth is mocked: no actual confirmation/reset emails are sent.
+
 To verify the actual hosted Supabase environment, run
-`supabase/tests/accounts.sql` in that project's SQL Editor. The SQL fixtures
+`supabase/tests/accounts.sql` and `supabase/tests/usernames.sql` in that project's SQL Editor. The SQL fixtures
 roll back. Then verify email-link delivery, sign-in, refresh, sign-out, and
 restoration in a second browser using real email accounts after following
 `supabase/README.md`.

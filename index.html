@@ -159,16 +159,51 @@
       <p class="eyebrow">YOUR DICEDLE ACCOUNT</p>
       <h2 id="account-title">Keep your lucky rolls.</h2>
       <div id="account-guest">
-        <p>Create an account or sign in with your email. Keep your best scores, history, and today's run with you on any device.</p>
+        <div class="account-tabs" role="group" aria-label="Account options"><button type="button" data-auth-mode="signin" aria-pressed="true">Sign in</button><button type="button" data-auth-mode="signup" aria-pressed="false">Create account</button></div>
+        <p id="account-form-intro">Sign in to keep your best scores, history, and today's run with you.</p>
         <form id="account-form">
+          <div id="account-username-field" hidden>
+            <label for="account-username">Username</label>
+            <input id="account-username" name="username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" aria-describedby="account-username-hint" required disabled />
+            <p class="account-field-hint" id="account-username-hint">3–24 letters, numbers, or underscores. Usernames are unique.</p>
+          </div>
           <label for="account-email">Email address</label>
-          <input id="account-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required />
-          <button class="account-action account-primary" id="account-send" type="submit">Email me a sign-in link</button>
+          <input id="account-email" name="email" type="email" autocomplete="username" placeholder="you@example.com" maxlength="254" required />
+          <div id="account-password-field">
+            <label for="account-password">Password</label>
+            <input id="account-password" name="password" type="password" autocomplete="current-password" maxlength="128" required />
+          </div>
+          <div id="account-confirm-field" hidden>
+            <label for="account-confirm-password">Confirm password</label>
+            <input id="account-confirm-password" name="confirm-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required disabled />
+          </div>
+          <button class="account-action account-primary" id="account-send" type="submit">Sign in</button>
         </form>
-        <p class="account-note">No password to remember. New here? The link creates your account after you confirm your email. You can always keep playing as a guest.</p>
+        <div class="account-auth-links"><button type="button" data-auth-mode="reset">Forgot password?</button><button type="button" data-auth-mode="confirm">Resend confirmation</button><button type="button" data-auth-mode="link">Use an email sign-in link</button></div>
+        <p class="account-note" id="account-auth-note">New accounts must confirm their email before signing in. You can always keep playing as a guest.</p>
       </div>
       <div id="account-member" hidden>
+        <p class="account-username-display" id="account-username-display"></p>
         <p class="account-email" id="account-email-display"></p>
+        <details class="account-settings" id="account-username-settings"><summary id="account-username-summary">Choose a username</summary>
+        <form class="account-settings-form" id="account-username-form">
+          <label for="account-edit-username">Your username</label>
+          <input id="account-edit-username" name="username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required aria-describedby="account-edit-username-hint" />
+          <p class="account-field-hint" id="account-edit-username-hint">3–24 letters, numbers, or underscores.</p>
+          <button class="account-action account-primary" type="submit">Save username</button>
+        </form>
+        </details>
+        <details class="account-settings" id="account-password-settings"><summary>Set or change password</summary>
+        <form class="account-settings-form" id="account-password-form">
+          <p id="account-password-intro">Set or change your password.</p>
+          <label for="account-new-password">New password</label>
+          <input id="account-new-password" name="new-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required aria-describedby="account-password-hint" />
+          <p class="account-field-hint" id="account-password-hint">Use at least 8 characters.</p>
+          <label for="account-new-password-confirm">Confirm new password</label>
+          <input id="account-new-password-confirm" name="confirm-new-password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required />
+          <button class="account-action account-primary" id="account-save-password" type="submit">Save password</button>
+        </form>
+        </details>
         <p>Your account keeps its own record book. You can also add the guest scores saved in this browser. If a day is already saved to your account, that run takes priority.</p>
         <div class="account-actions"><button class="account-action account-primary" id="account-sync">Sync scores</button><button class="account-action" id="account-import">Save this device's guest scores</button><button class="account-action" id="account-sign-out">Sign out</button></div>
       </div>

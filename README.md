@@ -18,11 +18,15 @@ Open `index.html` in a browser, or serve the folder with any static file server.
 - A woven background, raised score displays, dice, and tactile buttons
 - A large BUSTED roll button that still presses but cannot change a finished run
 - A profile with personal bests, today's run, roll-by-roll results, and paginated score history
-- Optional email sign-in, account score saving across devices, and guest score import
+- Unique usernames, email/password sign-in with email confirmation, saved account scores, and guest score import
 
 ## Optional email accounts
 
-Select the account icon in the header, or **Sign in / create account** on your profile. Players receive an email link that creates an account or signs them in; passwords are not needed. Signed-in runs and history are saved to that account. Guest play is still available.
+Select the account icon in the header, or **Sign in / create account** on your profile. New players choose a unique username, email, and password, then confirm their email before signing in. Sign-in uses email and password; usernames appear on profiles. Usernames contain 3–24 letters, numbers, or underscores and are unique regardless of capitalization. New passwords require at least 8 characters. Signed-in runs and history are saved to that account. Guest play is still available.
+
+**Forgot password?** sends an email link that opens the new-password form. **Resend confirmation** requests another signup confirmation email. Existing email-link players can still use **Use an email sign-in link**, then save a username and password in their account settings without changing their scores. Passwords are handled by Supabase Auth; the site does not save plaintext passwords in browser storage, score records, or profile rows.
+
+For an already configured Supabase project, run [usernames.sql](supabase/usernames.sql) once in its SQL Editor before publishing this update. Keep **Confirm email** enabled and the Confirm Signup and Reset Password templates using `{{ .ConfirmationURL }}`. See the [upgrade instructions](supabase/README.md).
 
 Account saving requires a Supabase project. Follow [the Supabase setup guide](supabase/README.md), run its SQL schema, and fill in the public values in `config.js`. Until connected, the account dialog explains that accounts are unavailable and the game continues to work for guests. The Supabase browser SDK is loaded only when accounts are configured.
 
