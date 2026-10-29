@@ -39,20 +39,17 @@ button:focus-visible { outline: 3px solid var(--mint); outline-offset: 6px; }
 h1, h2, p { margin-top: 0; }
 .app-shell { position: relative; width: min(100% - 40px, 940px); margin: 0 auto; padding: 26px 0 22px; }
 .site-header, .hero-copy, .site-footer { display: flex; align-items: center; justify-content: space-between; }
-.site-header { gap: 24px; padding: 0 4px 24px; }
-.brand-lockup { display: flex; align-items: center; gap: 13px; }
-.brand-mark { display: grid; grid-template-columns: repeat(3, 9px); gap: 5px; align-items: end; height: 29px; transform: rotate(-14deg); }
-.brand-mark span { width: 9px; height: 9px; background: var(--ink); border-radius: 50%; box-shadow: 0 3px 0 #050b0d; }
-.brand-mark span:nth-child(2) { height: 15px; border-radius: 6px; background: var(--mint); }
-.brand-mark span:nth-child(3) { height: 24px; border-radius: 6px; background: var(--gold); }
+.site-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: "brand nav actions"; gap: 24px; padding: 0 4px 24px; }
+.brand-lockup { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: 13px; }
+.brand-mark { display: block; flex-shrink: 0; width: 44px; height: 44px; }
 .eyebrow, .round-label, .site-footer { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .12em; }
 .eyebrow { margin: 0 0 4px; color: var(--muted); }
 h1 { margin: 0; font-size: 25px; line-height: 1; letter-spacing: -.06em; }
 .brand-dot { color: var(--mint); }
-.header-actions { display: flex; gap: 10px; }
+.header-actions { grid-area: actions; justify-self: end; display: flex; gap: 10px; }
 .account-icon svg { display: block; width: 19px; height: 19px; margin: auto; }
 .account-icon.is-signed-in { color: var(--mint); border-color: #528974; }
-.main-nav { display: flex; flex: 1; justify-content: center; gap: 8px; }
+.main-nav { grid-area: nav; justify-self: center; display: flex; width: max-content; justify-content: center; gap: 8px; }
 .nav-link { padding: 12px 18px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font-family: "DM Mono", monospace; font-size: 11px; letter-spacing: .1em; text-decoration: none; }
 .nav-link:hover { border-color: #35484e; color: var(--ink); background: #152229; }
 .nav-link[aria-current="page"] { border-color: #477568; background: linear-gradient(145deg, #233b34, #152822); color: var(--mint); box-shadow: 0 4px 0 #07110d, inset 0 1px 0 rgba(255, 255, 255, .04); }
@@ -362,6 +359,9 @@ body.is-play-page { --play-die-size: clamp(88px, 10.4dvh, 112px); }
   .die.rolling, .welcome-modal[open], .rolling-dots span, .roll-button.is-awaiting-roll::after { animation: none; }
   button, .score { transition: none; }
 }
+@media (max-width: 720px) {
+  .site-header { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand actions" "nav nav"; gap: 12px 16px; }
+}
 @media (max-width: 560px) {
   .app-shell { width: min(100% - 24px, 940px); padding-top: 20px; }
   .site-header { padding: 0 2px 22px; }
@@ -374,10 +374,9 @@ body.is-play-page { --play-die-size: clamp(88px, 10.4dvh, 112px); }
   .pip { width: 14px; height: 14px; }
   .welcome-modal { padding: 28px 22px 24px; }
   .site-footer { font-size: 7px; letter-spacing: .08em; }
-  .site-header { flex-wrap: wrap; gap: 16px; }
-  .brand-lockup { flex: 1; }
-  .main-nav { order: 3; flex-basis: 100%; gap: 10px; }
-  .nav-link { flex: 1; padding: 12px; text-align: center; }
+  .site-header { gap: 16px; }
+  .main-nav { gap: 10px; }
+  .nav-link { padding: 12px; text-align: center; }
   .profile-local-badge { display: none; }
   .profile-records { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .profile-metric { padding: 16px; }
@@ -426,13 +425,12 @@ body.is-play-page { --play-die-size: clamp(88px, 10.4dvh, 112px); }
 
 @media (max-width: 560px) {
   .is-play-page .app-shell { padding-block: 10px; }
-  .is-play-page .site-header { flex-wrap: nowrap; gap: 8px; padding-bottom: 12px; }
-  .is-play-page .brand-lockup { flex: 0 1 auto; gap: 8px; }
+  .is-play-page .site-header { gap: 8px; padding-bottom: 12px; }
+  .is-play-page .brand-lockup { gap: 8px; }
   .is-play-page .brand-lockup .eyebrow { font-size: 7px; letter-spacing: .06em; }
   .is-play-page h1 { font-size: 22px; }
-  .is-play-page .brand-mark { grid-template-columns: repeat(3, 7px); gap: 4px; height: 24px; }
-  .is-play-page .brand-mark span { width: 7px; }
-  .is-play-page .main-nav { order: 0; flex-basis: auto; gap: 4px; }
+  .is-play-page .brand-mark { width: 36px; height: 36px; }
+  .is-play-page .main-nav { gap: 4px; }
   .is-play-page .nav-link { flex: 0 1 auto; padding: 9px 8px; font-size: 10px; letter-spacing: .04em; }
   .is-play-page .icon-button { width: 34px; height: 34px; }
   .is-play-page .header-actions { gap: 6px; }
@@ -500,6 +498,6 @@ body.is-play-page { --play-die-size: clamp(88px, 10.4dvh, 112px); }
 @media (max-width: 360px) {
   .is-play-page h1 { font-size: 20px; }
   .is-play-page .icon-button { width: 32px; height: 32px; }
-  .is-play-page .brand-mark { display: none; }
+  .is-play-page .brand-mark { width: 32px; height: 32px; }
   .is-play-page .brand-lockup .eyebrow { font-size: 6px; }
 }
