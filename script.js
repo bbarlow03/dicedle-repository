@@ -394,7 +394,12 @@ document.querySelectorAll("dialog").forEach((modal) => {
   modal.addEventListener("close", () => {
     if (!document.querySelector("dialog[open]")) {
       document.body.classList.remove("has-open-modal");
-      (playPage.hidden ? profileLink : rollButton.disabled ? document.querySelector("#help-button") : rollButton).focus();
+      // The welcome popup has no opener to return to. Start at the heading so
+      // dismissing it does not give the roll button a keyboard-focus highlight.
+      // Other dialogs keep the browser's normal return-to-opener behavior.
+      if (modal === welcomeModal) {
+        document.querySelector(playPage.hidden ? "#profile-title" : "#game-title").focus({ preventScroll: true });
+      }
     }
   });
 });
