@@ -37,6 +37,7 @@ class DicedleHistory {
       rollCount: run.rolls.length,
       outcome: lastRoll[0] + lastRoll[1] === 7 ? "busted" : run.date < today ? "day-ended" : "in-progress",
       recordedAt: this.now(),
+      rolls: run.rolls.map(dice => [...dice]),
     };
   }
 
@@ -57,7 +58,16 @@ class DicedleHistory {
     const key = `${this.prefix}${record.id}`;
     const existing = this.parse(storage.getItem(key));
     if (this.validRecord(existing)
-      && (existing.rollCount >= record.rollCount || existing.outcome === "busted")) return existing;
+      && (existing.rollCount >= record.rollCount || existing.outcome === "busted")) {
+      // Recover raw dice from a synced run without changing an existing result.
+      if (!this.recordRun(existing) && existing.rollCount === record.rollCount && existing.score === record.score
+        && existing.outcome === record.outcome) {
+        const enriched = { ...existing, rolls: record.rolls };
+        storage.setItem(key, JSON.stringify(enriched));
+        return enriched;
+      }
+      return existing;
+    }
     storage.setItem(key, JSON.stringify(record));
     return record;
   }
@@ -65,6 +75,16 @@ class DicedleHistory {
   currentRun() {
     const run = this.parse(this.storageProvider().getItem(this.runKey));
     return this.validRun(run) ? run : null;
+  }
+
+  recordRun(record) {
+    if (!this.validRecord(record)) return null;
+    const run = { date: record.date, rolls: record.rolls };
+    if (!this.validRun(run) || run.rolls.length !== record.rollCount
+      || run.rolls.reduce((sum, dice) => sum + dice[0] + dice[1], 0) !== record.score) return null;
+    const last = run.rolls.at(-1);
+    if ((last[0] + last[1] === 7) !== (record.outcome === "busted")) return null;
+    return run;
   }
 
   captureSavedRun(today) {

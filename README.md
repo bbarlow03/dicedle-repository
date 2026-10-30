@@ -40,7 +40,7 @@ and restoration instructions. The backup is not published to the website.
 - Two animated dice with randomized rolls from 2–12
 - A score that accumulates on every roll, including the busting seven
 - Immediate bust when the dice total seven, after adding 7 points
-- Welcome popup with Dicedle rules, plus help and PLAY / PROFILE navigation
+- Welcome popup with Dicedle rules, plus help and PLAY / PROFILE / ACHIEVEMENTS navigation
 - One run per local calendar day, saved between page visits
 - Automatic unlock each new day and a live countdown to the next run
 - A pixel arcade theme, raised score displays, dice, and tactile buttons
@@ -69,6 +69,46 @@ The profile shows best score, the most rolls in a single run, runs played, avera
 The profile tracks your daily runs. Completed runs are stored under individual `dicedle.history.v1.daily.*` keys in browser storage, with one stable record per day so refreshing or opening another tab does not count a run twice. The busting seven counts toward both the score and roll count. An unfinished run is saved as **Day ended** when its local day passes.
 
 The most recent existing saved daily run is imported automatically into local history. Earlier results already overwritten before this feature was added cannot be recovered. Guest records remain local to this browser and site address; clearing site data removes them. Account records remain in Supabase and are restored after signing in.
+
+## Achievements
+
+Open **ACHIEVEMENTS** in the header, or `index.html#achievements`, for the trophy
+room. It includes 126 achievements: seven regular categories plus a separate
+Secret section for 12 curated rare discoveries. Locked secrets hide their names,
+conditions, targets, and progress, including in search results. Collecting one
+reveals its details and keeps its existing saved ID and collection date. The collection
+has progress bars, collected dates, search, category selection, and status filters.
+
+Achievements collect automatically from confirmed saved runs after the dice
+settle. Notifications appear on any page, including over open help/account
+dialogs, without taking keyboard focus. They dismiss after six seconds, pause
+while hovered, focused, or in a background tab, and include a link to the trophy
+room. Large batches show two individual awards and one summary notification.
+
+Guest unlocks are saved under `dicedle.achievements.v1.<achievement-id>`;
+accounts use their existing `dicedle.account.<user-id>.` storage namespace. Each
+award is saved once and remains collected. Web Locks serialize collection across
+tabs where available, so revisiting, refreshing, or switching pages does not
+repeat the notifications. Signing out clears pending account notifications and
+restores the guest collection.
+
+Existing history automatically earns applicable awards. New history records
+retain raw dice, and syncing an account enriches older summaries when the cloud
+still has the original run. This lets dice-pattern achievements follow synced
+scores without a Supabase migration. Summary-only older records still count
+toward score, roll, day, and bust milestones; missing dice patterns cannot be
+reconstructed. Collection timestamps are local to the device that first
+collects the award. "First-ever" refers to the earliest run in retained history.
+
+Edit `achievements.js` to rename achievements, change targets, or remove entries
+from the catalog. `achievements-ui.js` controls filtering and notifications;
+`achievements.css` styles the collection. `achievement_ideas.md` remains the
+original ideas file.
+
+Open `tests/achievements.html` locally to run the automated achievement checks
+using memory-only fixtures. They cover milestones, patterns, old-history
+backfill, duplicate prevention, separate accounts, calendar streaks, and failed
+saves without accessing real scores or Supabase.
 
 ## Daily play
 

@@ -17,8 +17,14 @@ const playPage = document.querySelector("#play-page");
 const profilePage = document.querySelector("#profile-page");
 const playLink = document.querySelector("#play-link");
 const profileLink = document.querySelector("#profile-link");
+const achievementsPage = document.querySelector("#achievements-page");
+const achievementsLink = document.querySelector("#achievements-link");
 const accounts = new DicedleAccounts(window.DICEDLE_CONFIG);
 const scoreHistory = new DicedleHistory(() => accounts.storage);
+const achievementBook = new DicedleAchievements(() => accounts.storage);
+const achievementView = new DicedleAchievementsView();
+let achievementScope = accounts.storage.namespace;
+let achievementScopeRevision = 0;
 const storageKey = scoreHistory.runKey;
 let historyPage = 0;
 let historyError = "";
@@ -353,6 +359,12 @@ function profileDate(dateKey) {
 }
 
 function renderProfile() {
+  const namespace = accounts.storage.namespace;
+  if (namespace !== achievementScope) {
+    achievementScope = namespace;
+    achievementScopeRevision += 1;
+    achievementView.reset(namespace);
+  }
   const errorElement = document.querySelector("#profile-error");
   let data;
   try {
@@ -366,7 +378,12 @@ function renderProfile() {
   document.querySelectorAll(".play-best").forEach(label => {
     label.hidden = !data || data.stats.completedRuns === 0;
   });
-  if (!data) return;
+  if (!data) {
+    document.querySelector("#achievements-error").textContent = historyError;
+    document.querySelector("#achievements-error").hidden = false;
+    return;
+  }
+  refreshAchievements(data);
 
   const stats = data.stats;
   document.querySelector("#play-best-score").textContent = profileNumber(stats.bestScore ?? 0);
@@ -442,20 +459,35 @@ function renderProfile() {
   document.querySelector("#history-next").disabled = offset + historyPageSize >= records.length;
 }
 
+function refreshAchievements(data) {
+  // Announce confirmed results after the dice settle, and after account sync completes.
+  if (isRolling || accounts.busy) return;
+  const revision = achievementScopeRevision;
+  achievementBook.collect(data).then(snapshot => {
+    if (snapshot && revision === achievementScopeRevision && snapshot.namespace === accounts.storage.namespace) {
+      achievementView.apply(snapshot);
+    }
+  }).catch(() => {
+    if (revision !== achievementScopeRevision) return;
+    const error = document.querySelector("#achievements-error");
+    error.textContent = "Your achievements could not be refreshed. Try again when saved site data is available.";
+    error.hidden = false;
+  });
+}
+
 function showPage(moveFocus = false) {
-  const viewingProfile = window.location.hash === "#profile";
-  document.body.classList.toggle("is-play-page", !viewingProfile);
-  playPage.hidden = viewingProfile;
-  profilePage.hidden = !viewingProfile;
-  const activeLink = viewingProfile ? profileLink : playLink;
-  const inactiveLink = viewingProfile ? playLink : profileLink;
-  activeLink.setAttribute("aria-current", "page");
-  inactiveLink.removeAttribute("aria-current");
-  document.title = viewingProfile ? "Your profile — Dicedle" : "Dicedle — Roll your luck";
-  if (viewingProfile) renderProfile();
+  const route = window.location.hash === "#profile" ? "profile" : window.location.hash === "#achievements" ? "achievements" : "play";
+  document.body.classList.toggle("is-play-page", route === "play");
+  for (const [name, page, link] of [["play", playPage, playLink], ["profile", profilePage, profileLink], ["achievements", achievementsPage, achievementsLink]]) {
+    page.hidden = name !== route;
+    if (name === route) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  }
+  document.title = route === "profile" ? "Your profile — Dicedle" : route === "achievements" ? "Achievements — Dicedle" : "Dicedle — Roll your luck";
+  if (route !== "play") renderProfile();
   if (moveFocus) {
     document.querySelectorAll("dialog[open]").forEach(modal => modal.close());
-    const heading = document.querySelector(viewingProfile ? "#profile-title" : "#game-title");
+    const heading = document.querySelector(route === "profile" ? "#profile-title" : route === "achievements" ? "#achievements-title" : "#game-title");
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
     window.scrollTo(0, 0);
@@ -479,7 +511,7 @@ document.querySelectorAll("dialog").forEach((modal) => {
       // dismissing it does not give the roll button a keyboard-focus highlight.
       // Other dialogs keep the browser's normal return-to-opener behavior.
       if (modal === welcomeModal) {
-        document.querySelector(playPage.hidden ? "#profile-title" : "#game-title").focus({ preventScroll: true });
+        document.querySelector(!achievementsPage.hidden ? "#achievements-title" : playPage.hidden ? "#profile-title" : "#game-title").focus({ preventScroll: true });
       }
     }
   });

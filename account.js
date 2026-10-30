@@ -9,7 +9,8 @@ class DicedleStorage {
   ownsKey(key) {
     if (typeof key !== "string" || !key.startsWith(this.namespace)) return false;
     const local = key.slice(this.namespace.length);
-    return local === "dicedle.dailyRun.v1" || local.startsWith("dicedle.history.v1.daily.");
+    return local === "dicedle.dailyRun.v1" || local.startsWith("dicedle.history.v1.daily.")
+      || local.startsWith("dicedle.achievements.v1.");
   }
   keys() {
     const storage = this.storageProvider();

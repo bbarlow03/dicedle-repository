@@ -16,6 +16,7 @@
     <link rel="preload" href="assets/fonts/VT323-Regular.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="arcade.css" />
+    <link rel="stylesheet" href="achievements.css" />
   </head>
   <body class="is-play-page">
     <main class="app-shell">
@@ -30,6 +31,7 @@
         <nav class="main-nav" aria-label="Main navigation">
           <a class="nav-link" id="play-link" href="#play" aria-current="page">PLAY</a>
           <a class="nav-link" id="profile-link" href="#profile">PROFILE</a>
+          <a class="nav-link" id="achievements-link" href="#achievements">ACHIEVEMENTS</a>
         </nav>
         <div class="header-actions">
           <button class="icon-button account-icon" id="account-button" data-open-account aria-label="Sign in or create an account" aria-haspopup="dialog"><svg viewBox="0 0 16 16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M6 1h4v1h1v4h-1v1H6V6H5V2h1zm1 1v1H6v2h1v1h2V5h1V3H9V2zM5 8h6v1h2v2h1v4h-2v-4h-1v-1H5v1H4v4H2v-4h1V9h2z"/></svg></button>
@@ -130,6 +132,37 @@
         <p class="profile-storage-note" id="profile-storage-note">Your daily records are saved in this browser, ready when you return.</p>
       </section>
 
+      <section class="achievements-page" id="achievements-page" aria-labelledby="achievements-title" hidden>
+        <header class="hero-copy achievements-hero">
+          <div>
+            <p class="round-label">THE TROPHY ROOM</p>
+            <h2 id="achievements-title" tabindex="-1">Achievements.</h2>
+            <p class="lede">Big rolls. Spectacular busts. Bragging rights for all of them.</p>
+          </div>
+          <div class="achievement-completion">
+            <p><strong id="achievements-collected">0</strong><span> / <span id="achievements-total">0</span></span></p>
+            <span>ACHIEVEMENTS COLLECTED</span>
+            <progress id="achievements-progress" max="1" value="0" aria-label="Achievement collection progress"></progress>
+            <span id="achievements-progress-text">0% collected</span>
+          </div>
+        </header>
+        <p class="achievements-intro">Unlocks happen automatically, wherever you are on the site. Your saved history counts too.</p>
+        <p class="profile-error" id="achievements-error" role="status" hidden></p>
+        <div class="achievement-toolbar" aria-label="Filter achievements">
+          <div class="achievement-filters" role="group" aria-label="Collection status">
+            <button type="button" data-achievement-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-achievement-filter="unlocked" aria-pressed="false">Collected</button>
+            <button type="button" data-achievement-filter="locked" aria-pressed="false">Locked</button>
+          </div>
+          <label>Category<select id="achievement-category"><option value="all">All categories</option></select></label>
+          <label>Find an achievement<input id="achievement-search" type="search" placeholder="Try doubles, score, or seven..." autocomplete="off" /></label>
+        </div>
+        <div class="achievement-results-meta"><p id="achievement-results-count" role="status"></p><span id="achievements-storage">SAVED ON THIS DEVICE</span></div>
+        <div id="achievement-groups"></div>
+        <p class="achievements-empty" id="achievements-empty" hidden>No matches. Try another search or filter.</p>
+        <p class="achievements-footnote">Older runs with totals only count toward milestones. Dice-pattern achievements need saved roll details. Signing in brings achievements along with your synced scores.</p>
+      </section>
+
       <footer class="site-footer">
         <span>MAKE EVERY ROLL COUNT</span>
         <span id="daily-footer">ONE RUN EVERY DAY</span>
@@ -215,9 +248,12 @@
       <p class="account-status" id="account-status" role="status" aria-live="polite"></p>
       <button class="account-dismiss" data-close-modal>Back to Dicedle</button>
     </dialog>
+    <div id="achievement-toasts" popover="manual" role="status" aria-live="polite" aria-atomic="false" hidden></div>
     <script src="config.js"></script>
     <script src="history.js"></script>
     <script src="account.js"></script>
+    <script src="achievements.js"></script>
+    <script src="achievements-ui.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
