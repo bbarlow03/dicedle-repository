@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <title>Tumbling die showing 3</title>
+  <path fill="#161616" d="M6 1h36v2h3v3h2v36h-2v3h-3v2H6v-2H3v-3H1V6h2V3h3z"/>
+  <path fill="#858582" d="M6 3h36v3h3v36h-3v3H6v-3H3V6h3z"/>
+  <path fill="#b5b5b0" d="M6 3h36v3H7v35H3V6h3z"/>
+  <path fill="#cececa" d="M7 7h34v34H7z"/>
+  <path fill="#acaca7" d="M41 6h2v36h-2zM6 41h35v2H6z"/>
+  <path data-pip="1" fill="#101211" transform="translate(10 10)" d="M2 0h4v1h2v2h1v3H8v2H6v1H2V8H0V2h2z"/>
+  <path data-pip="2" fill="#101211" transform="translate(20 20)" d="M2 0h4v1h2v2h1v3H8v2H6v1H2V8H0V2h2z"/>
+  <path data-pip="3" fill="#101211" transform="translate(30 30)" d="M2 0h4v1h2v2h1v3H8v2H6v1H2V8H0V2h2z"/>
+</svg>

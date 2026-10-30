@@ -89,12 +89,13 @@ class DicedleAccounts extends EventTarget {
     document.querySelector("#account-password-intro").textContent = this.recoveryPending ? "Choose a new password to finish resetting your account." : "Set or change your password.";
     document.querySelector("#account-username-summary").textContent = this.username ? "Change username" : "Choose a username";
     if (this.recoveryPending) document.querySelector("#account-password-settings").open = true;
-    document.querySelector("#profile-account-action").textContent = signedIn ? "Manage account" : "Sign in / create account";
+    document.querySelector("#profile-account-action").textContent = signedIn ? "Manage account" : "Sign in / sign up";
     document.querySelector("#profile-account-copy").textContent = signedIn
-      ? `Signed in as ${this.username ? `@${this.username}` : this.user.email}. Your runs are saved to your account.`
-      : "Play as a guest, or sign in with your email to keep your scores across devices.";
-    document.querySelector("#profile-account-status").textContent = signedIn ? this.message : "Guest scores stay in this browser.";
-    document.querySelector("#profile-save-badge").textContent = signedIn ? "SAVED TO YOUR ACCOUNT" : "SAVED ON THIS DEVICE";
+      ? `Signed in as ${this.username ? `@${this.username}` : this.user.email}. Your scores sync across devices.`
+      : "Play as a guest and save your scores locally, or sign in to keep them across multiple devices.";
+    document.querySelector("#profile-account-status").textContent = signedIn ? this.message : "";
+    document.querySelector("#profile-account-status").hidden = !signedIn || !this.message;
+    document.querySelector("#profile-save-badge").textContent = signedIn ? "SAVED TO ACCOUNT" : "SAVED LOCALLY";
     document.querySelector("#profile-storage-note").textContent = signedIn
       ? "Your daily records are saved to your account, with a separate copy on this device."
       : "Your daily records are saved in this browser, ready when you return.";

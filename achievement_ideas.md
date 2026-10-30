@@ -12,3 +12,9 @@ reach a score of 100
 reach a score of 150
 reach a score of 200
 reach a score of 300
+total 100 score
+total 250 score
+total 500 score
+total 1000 score
+total 5000 score
+total 10000 score

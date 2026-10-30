@@ -218,6 +218,17 @@ h2 { margin-bottom: 12px; font-size: clamp(36px, 6vw, 56px); line-height: 1; let
 #stat-status { font-size: 17px; line-height: 2; }
 
 /* Profile records share the game's raised surfaces. */
+.profile-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.profile-intro { min-width: 0; }
+.profile-hero .lede { max-width: 560px; }
+.profile-account-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+.profile-account-actions .account-action { white-space: nowrap; }
+#profile-account-status { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .profile-hero { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 22px 24px; }
+  .profile-account-actions { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .profile-hero .profile-local-badge { display: inline-block; }
+}
 .profile-local-badge { flex-shrink: 0; padding: 9px 11px; border: 1px solid #36504e; border-radius: 8px; background: #14242a; color: #a3beb4; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .07em; }
 .profile-error { padding: 14px 18px; border: 1px solid #725b38; border-radius: 10px; background: #2a241b; color: var(--gold); font-size: 12px; line-height: 1.7; }
 .profile-records { margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }

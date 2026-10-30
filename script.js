@@ -23,7 +23,8 @@ const storageKey = scoreHistory.runKey;
 let historyPage = 0;
 let historyError = "";
 const historyPageSize = 10;
-const rollDuration = 650;
+const rollDuration = 750;
+const subsequentBustChance = 1 / 7;
 const gameOverMessages = [
   "Seven had other plans.",
   "Your luck just clocked out.",
@@ -103,6 +104,22 @@ function randomDie() {
   return Math.floor(Math.random() * 6) + 1;
 }
 
+function randomDice(previousRollCount) {
+  if (previousRollCount === 0) return [randomDie(), randomDie()];
+
+  if (Math.random() < subsequentBustChance) {
+    const first = randomDie();
+    return [first, 7 - first];
+  }
+
+  // Select equally from the 30 ordered pairs that do not total seven.
+  const index = Math.floor(Math.random() * 30);
+  const first = Math.floor(index / 5) + 1;
+  let second = index % 5 + 1;
+  if (second >= 7 - first) second += 1;
+  return [first, second];
+}
+
 function rememberRunHistory(run) {
   try {
     scoreHistory.remember(run, localDateKey());
@@ -116,6 +133,60 @@ function showDice(first, second, hasRolled = true) {
   dieTwo.dataset.value = second;
   dieOne.setAttribute("aria-label", hasRolled ? `First die: ${first}` : "First die, waiting to roll");
   dieTwo.setAttribute("aria-label", hasRolled ? `Second die: ${second}` : "Second die, waiting to roll");
+}
+
+function prepareTumblingDie(die, value, duration, previousValue = value) {
+  let cube = die.querySelector(".die-cube");
+  if (!cube) {
+    cube = document.createElement("span");
+    cube.className = "die-cube";
+    cube.setAttribute("aria-hidden", "true");
+    for (const side of ["front", "back", "right", "left", "top", "bottom"]) {
+      const core = document.createElement("span");
+      core.className = `die-core-face die-face-${side}`;
+      cube.append(core);
+      const face = document.createElement("span");
+      face.className = `die-face die-face-${side}`;
+      cube.append(face);
+    }
+    // Eight triangular bevels close the cut corners of the six main faces.
+    // Each triangle joins three face edges, forming a solid chamfered cube.
+    for (const x of [-1, 1]) {
+      for (const y of [-1, 1]) {
+        for (const z of [-1, 1]) {
+          const corner = document.createElement("span");
+          corner.className = "die-corner";
+          const u = [x / Math.sqrt(2), -y / Math.sqrt(2), 0];
+          const v = [x / Math.sqrt(6), y / Math.sqrt(6), -2 * z / Math.sqrt(6)];
+          const normal = [y * z / Math.sqrt(3), x * z / Math.sqrt(3), x * y / Math.sqrt(3)];
+          const matrix = [...u, 0, ...v, 0, ...normal, 0, 0, 0, 0, 1];
+          corner.style.transform = `translate3d(calc(var(--cube-size) * ${x * .4}), calc(var(--cube-size) * ${y * .5}), calc(var(--cube-size) * ${z * .5})) matrix3d(${matrix.join(",")}) translate(-.4px, -.25px) scale(1.08)`;
+          const shade = 178 - y * 8 + z * 4 - x * 6;
+          corner.style.backgroundColor = `rgb(${shade}, ${shade}, ${shade - 4})`;
+          cube.append(corner);
+        }
+      }
+    }
+    const stage = document.createElement("span");
+    stage.className = "die-cube-stage";
+    stage.setAttribute("aria-hidden", "true");
+    stage.append(cube);
+    die.append(stage);
+  }
+  // Adjacent faces keep a consistent orientation; opposite sides total seven.
+  const adjacent = [[2, 3], [6, 3], [2, 6], [2, 1], [1, 3], [5, 3]][value - 1];
+  const faces = [value, 7 - value, adjacent[0], 7 - adjacent[0], adjacent[1], 7 - adjacent[1]];
+  cube.querySelectorAll(".die-face").forEach((face, index) => {
+    face.style.backgroundImage = `url("assets/arcade/die-roll-${faces[index]}.svg")`;
+  });
+  die.style.setProperty("--roll-from-face", `url("assets/arcade/die-face-${previousValue}.svg")`);
+  // Match the visible flat outline after perspective magnifies the front face.
+  const width = die.clientWidth;
+  const cubeSize = width * .72;
+  const visibleWidth = width * 46 / 48;
+  const restingScale = visibleWidth / (cubeSize + 1.2 + visibleWidth * cubeSize / 1100);
+  die.style.setProperty("--cube-rest-scale", restingScale);
+  die.style.setProperty("--roll-duration", `${duration}ms`);
 }
 
 function renderGame() {
@@ -143,7 +214,7 @@ function renderGame() {
   } else if (busted) {
     const message = gameOverMessages[dailyRun.gameOverMessageIndex];
     status.textContent = typeof message === "string" ? message : gameOverMessages[0];
-    dailyMessage.textContent = "Today's run is factum est. Come back tomorrow for another chance at glory.";
+    dailyMessage.textContent = "Cursus hodiernus factus est. Come back tomorrow for another chance at glory.";
   } else if (lastRoll) {
     const message = safeRollMessages[dailyRun.safeRollMessageIndex];
     status.textContent = typeof message === "string" ? message : safeRollMessages[0];
@@ -201,7 +272,7 @@ async function roll() {
       const next = {
         date: latest.date,
         id: latest.date,
-        rolls: [...latest.rolls, [randomDie(), randomDie()]],
+        rolls: [...latest.rolls, randomDice(latest.rolls.length)],
       };
       if (isBusted(next)) {
         next.gameOverMessageIndex = Math.floor(Math.random() * gameOverMessages.length);
@@ -230,7 +301,12 @@ async function roll() {
       return;
     }
 
-    showDice(...dailyRun.rolls[dailyRun.rolls.length - 1]);
+    const finalDice = dailyRun.rolls[dailyRun.rolls.length - 1];
+    const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : rollDuration;
+    const previousDice = [Number(dieOne.dataset.value), Number(dieTwo.dataset.value)];
+    showDice(...finalDice);
+    prepareTumblingDie(dieOne, finalDice[0], duration, previousDice[0]);
+    prepareTumblingDie(dieTwo, finalDice[1], duration, previousDice[1]);
     dieOne.classList.remove("rolling", "bust");
     dieTwo.classList.remove("rolling", "bust");
     void dieOne.offsetWidth;
@@ -240,7 +316,7 @@ async function roll() {
     status.innerHTML = '<span class="sr-only">Rolling the dice</span><span class="rolling-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>';
     rollTimer = window.setTimeout(() => {
       if (version === rollVersion) syncDailyRun();
-    }, rollDuration);
+    }, duration);
   } catch {
     if (version !== rollVersion) return;
     isRolling = false;
@@ -287,6 +363,9 @@ function renderProfile() {
   }
   errorElement.hidden = !historyError;
   errorElement.textContent = historyError;
+  document.querySelectorAll(".play-best").forEach(label => {
+    label.hidden = !data || data.stats.completedRuns === 0;
+  });
   if (!data) return;
 
   const stats = data.stats;
@@ -305,15 +384,17 @@ function renderProfile() {
 
   const current = data.currentRun;
   const rolls = current?.rolls || [];
+  const runScore = rolls.reduce((sum, dice) => sum + rollTotal(dice), 0);
+  const averageRollScore = rolls.length ? runScore / rolls.length : null;
   const busted = Boolean(current && isBusted(current));
   document.querySelector("#profile-today-date").textContent = profileDate(localDateKey());
-  document.querySelector("#stat-score").textContent = profileNumber(rolls.reduce((sum, dice) => sum + rollTotal(dice), 0));
+  document.querySelector("#stat-score").textContent = profileNumber(runScore);
   document.querySelector("#stat-rolls").textContent = profileNumber(rolls.length);
   document.querySelector("#stat-status").textContent = busted ? "Busted" : rolls.length ? "In play" : "Ready";
   document.querySelector("#profile-play-link").textContent = busted
     ? "Back to play →" : rolls.length ? "Continue run →" : "Roll to play →";
   document.querySelector("#profile-today-note").textContent = busted
-    ? "Your final score includes the seven that ended this run."
+    ? `You averaged ${profileNumber(averageRollScore)} points per roll this run.`
     : rolls.length ? "Your progress is saved. Keep rolling when you're ready." : "Your first roll starts today's story.";
   const rollChips = rolls.map((dice, index) => {
     const chip = document.createElement("li");

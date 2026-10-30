@@ -1,0 +1,228 @@
+/* Visual-only arcade skin; the original layout is preserved in styles.css. */
+@font-face { font-family: "Press Start 2P"; src: url("assets/fonts/PressStart2P-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "VT323"; src: url("assets/fonts/VT323-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+:root {
+  color-scheme: light;
+  --ink: #332d2b; --muted: #795b50; --paper: #f4c19d; --card: #ffeddc; --line: #b6846a;
+  --mint: #386747; --mint-dark: #284b34; --gold: #9d5f35; --gold-dark: #774429; --bust-red: #a83f45;
+  --arcade-display: "Press Start 2P", monospace; --arcade-text: "VT323", monospace;
+  --shadow: 4px 4px 0 #b28268, inset 0 2px 0 #fff9ec, inset 0 -2px 0 #d5b49c;
+}
+body { background: var(--paper); font-family: var(--arcade-text); font-size: 20px; font-synthesis: none; }
+body::before { background-image: repeating-linear-gradient(0deg, transparent 0 3px, #8c59400b 3px 4px), linear-gradient(#a5765c12 1px, transparent 1px), linear-gradient(90deg, #a5765c12 1px, transparent 1px); background-size: auto, 16px 16px, 16px 16px; }
+::selection { background: #416747; color: #fff2e4; }
+/* Apply the two pixel fonts consistently, including controls with legacy font rules. */
+:root * { font-family: var(--arcade-text) !important; font-weight: 400; }
+:root h1, :root h2, :root h3, :root .roll-button > span, :root .welcome-play { font-family: var(--arcade-display) !important; font-weight: 400; letter-spacing: -.04em; }
+:root h1 { font-size: 19px; line-height: 1.5; text-shadow: 2px 2px 0 #fff1df; }
+:root .brand-lockup .eyebrow { color: #775747; font-size: 14px; letter-spacing: .03em; }
+:root .brand-dot { color: #a14a32; }
+:root .brand-mark { image-rendering: pixelated; }
+:root .nav-link { border-radius: 0; color: #735447; font-size: 18px; line-height: 1; letter-spacing: .06em; }
+:root .nav-link[aria-current="page"] { border-color: #55423a; color: #332d2b; background: #fff0dd; box-shadow: 3px 3px 0 #b28268, inset 0 2px 0 #fffaf1; }
+:root .nav-link:hover { background: #fce3c9; border-color: #7f5b49; color: #332d2b; }
+:root .nav-link:focus-visible, :root .profile-play-link:focus-visible { border-radius: 0; }
+:root .icon-button { border-radius: 0; border-color: #635047; background: #fff0df; color: #3c3330; box-shadow: 3px 3px 0 #b28268, inset 0 2px 0 #fff9ef; font-size: 24px; }
+:root .icon-button:hover { border-color: #386747; }
+:root .icon-button:active { box-shadow: 1px 1px 0 #b28268; }
+:root .account-icon.is-signed-in { color: #386747; border-color: #386747; }
+
+/* Hard pixel borders, warm panels, and flat cast shadows. */
+:root .hero-copy, :root .score-plaque, :root .rolls-plaque, :root .profile-metric, :root .profile-panel, :root .stats-grid > div { border: 2px solid #665044; border-radius: 0; background: #ffeddc; box-shadow: var(--shadow); }
+:root .hero-copy { background: #f9dfc7; clip-path: polygon(0 8px, 8px 8px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)); }
+:root .round-label { color: #795b50; font-size: 15px; line-height: 1; letter-spacing: .07em; }
+:root .live-dot { width: 6px; height: 6px; border-radius: 0; background: #537552; box-shadow: 2px 2px 0 #c19d7b; }
+:root h2 { font-size: clamp(18px, 3vw, 30px); line-height: 1.4; }
+:root .game-hero h2 { color: #332d2b; font-size: clamp(14px, 3.5vw, 30px); line-height: 1.4; text-shadow: 3px 3px 0 #fff3e3; }
+:root .game-hero .round-label { font-size: 14px; }
+:root .lede { color: #795b50; font-size: 20px; line-height: 1.15; }
+:root .game-hero .lede { font-size: 19px; line-height: 1.15; }
+:root .score-row .eyebrow { color: #795b50; font-size: 14px; line-height: 1; letter-spacing: .03em; }
+:root .score { color: #386747; font-size: clamp(52px, 7dvh, 76px); line-height: .9; letter-spacing: .02em; text-shadow: 2px 2px 0 #c4d1a4; }
+:root .roll-count { color: #403b38; font-size: clamp(46px, 6dvh, 68px); line-height: 1; text-shadow: 2px 2px 0 #d1baa3; }
+:root .play-best { color: #795b50; font-size: 17px; line-height: 1; }
+:root .play-best strong { color: #332d2b; }
+:root .bust-warning { border-radius: 0; border-color: #b46a60; background: #f8d4bf; color: #a83f45; font-size: 14px; line-height: 1; letter-spacing: .02em; box-shadow: 2px 2px 0 #cc997c; }
+:root .warning-dot { border-radius: 0; }
+
+/* Flat results, with six-sided cubes shown only during a roll. */
+:root .die { --rest-face: url("assets/arcade/die-face-1.svg"); --cube-size: calc(var(--play-die-size, 106px) * .72); --tumble-x: -1; --tumble-y: 1; border: 0; border-radius: 0; background: var(--rest-face) center / 100% 100% no-repeat; box-shadow: none; filter: drop-shadow(3px 4px 0 #b38269); image-rendering: pixelated; }
+:root .die[data-value="2"] { --rest-face: url("assets/arcade/die-face-2.svg"); }
+:root .die[data-value="3"] { --rest-face: url("assets/arcade/die-face-3.svg"); }
+:root .die[data-value="4"] { --rest-face: url("assets/arcade/die-face-4.svg"); }
+:root .die[data-value="5"] { --rest-face: url("assets/arcade/die-face-5.svg"); }
+:root .die[data-value="6"] { --rest-face: url("assets/arcade/die-face-6.svg"); }
+:root .die .pip { display: none; }
+:root #die-two { --tumble-x: 1; --tumble-y: -1; }
+.die-cube-stage { display: none; position: absolute; inset: 0; perspective: 550px; }
+.die-cube { display: none; position: absolute; top: 14%; left: 14%; width: var(--cube-size); height: var(--cube-size); transform-style: preserve-3d; }
+/* Opaque octagonal faces and eight bevels form a closed solid with cut corners. */
+.die-face { position: absolute; inset: -.6px; background-color: #cececa; background-position: center; background-size: 104.35% 104.35%; background-repeat: no-repeat; backface-visibility: hidden; image-rendering: pixelated; clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%); }
+.die-corner { position: absolute; left: 50%; top: 50%; width: calc(var(--cube-size) * .1414213562); height: calc(var(--cube-size) * .1224744871); transform-origin: 0 0; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+/* An inset gray core prevents antialiased joins from revealing the page. */
+.die-core-face { position: absolute; inset: 3.4%; --face-depth: calc(var(--cube-size) * .466); background: #cececa; backface-visibility: hidden; }
+.die-face-front { transform: translateZ(var(--face-depth, calc(var(--cube-size) / 2))); }
+.die-face-back { transform: rotateY(180deg) translateZ(var(--face-depth, calc(var(--cube-size) / 2))); filter: brightness(.82); }
+.die-face-right { transform: rotateY(90deg) translateZ(var(--face-depth, calc(var(--cube-size) / 2))); filter: brightness(.76); }
+.die-face-left { transform: rotateY(-90deg) translateZ(var(--face-depth, calc(var(--cube-size) / 2))); filter: brightness(.88); }
+.die-face-top { transform: rotateX(90deg) translateZ(var(--face-depth, calc(var(--cube-size) / 2))); filter: brightness(1.12); }
+.die-face-bottom { transform: rotateX(-90deg) translateZ(var(--face-depth, calc(var(--cube-size) / 2))); filter: brightness(.72); }
+:root .die.rolling { background-image: none; filter: none; perspective: 550px; animation: none; }
+.die.rolling::before, .die.rolling::after { content: ""; position: absolute; inset: 0; background-position: center; background-size: 100% 100%; background-repeat: no-repeat; image-rendering: pixelated; filter: drop-shadow(3px 4px 0 #b38269); pointer-events: none; }
+.die.rolling::before { z-index: 1; background-image: var(--roll-from-face); animation: flat-die-out var(--roll-duration, 750ms) linear both; }
+.die.rolling::after { z-index: 2; background-image: var(--rest-face); animation: flat-die-in var(--roll-duration, 750ms) linear both; }
+.die.rolling .die-cube-stage { z-index: 0; display: block; }
+.die.rolling .die-cube { display: block; will-change: transform; animation: cube-tumble var(--roll-duration, 750ms) cubic-bezier(.2, .65, .3, 1) both; }
+@keyframes cube-tumble {
+  0% { transform: rotateX(0) rotateY(0) rotateZ(0) scale3d(var(--cube-rest-scale, 1.22), var(--cube-rest-scale, 1.22), var(--cube-rest-scale, 1.22)); }
+  100% { transform: rotateX(calc(var(--tumble-x) * 360deg)) rotateY(calc(var(--tumble-y) * 360deg)) rotateZ(0) scale3d(var(--cube-rest-scale, 1.22), var(--cube-rest-scale, 1.22), var(--cube-rest-scale, 1.22)); }
+}
+@keyframes flat-die-out { 0% { opacity: 1; } 12%, 100% { opacity: 0; } }
+@keyframes flat-die-in { 0%, 86% { opacity: 0; } 100% { opacity: 1; } }
+:root .plus { color: #87624f; text-shadow: 2px 2px 0 #ffe6cd; }
+:root .roll-result { border-color: #a37c63; border-radius: 0; background: #ffe8d2; color: #604b40; box-shadow: 3px 3px 0 #bd8d71; font-size: 17px; line-height: 1; }
+
+/* Preserve green/red button states with hard arcade highlight rings. */
+:root .roll-button { --button-glow: 0 0 0 3px #38674724, 0 0 0 6px #3867470d; border: 2px solid #698363; border-radius: 0; background: #45433f; color: #c5dfa8; box-shadow: inset 0 3px 0 #74706a, inset 0 -4px 0 #302d2c, 0 7px 0 #6a4d40, var(--button-glow); transition-timing-function: steps(2, end); }
+:root .roll-button > span { font-size: 19px; line-height: 1.3; letter-spacing: .02em; text-shadow: 2px 2px 0 #242524; }
+:root .roll-button small { color: #dfd7c7; font-size: 14px; letter-spacing: .06em; }
+:root .roll-button:enabled:hover, :root .roll-button:focus-visible { --button-glow: 0 0 0 3px #3867474d, 0 0 0 7px #38674724; }
+:root .roll-button:focus-visible { outline: 2px solid #c5dfa8; outline-offset: -5px; }
+:root .roll-button:enabled:active { box-shadow: inset 0 2px 0 #74706a, inset 0 -2px 0 #302d2c, 0 1px 0 #6a4d40, var(--button-glow); }
+:root .roll-button.is-awaiting-roll::after { border-radius: 0; box-shadow: 0 0 0 3px #38674744, 0 0 0 7px #3867471f; animation-timing-function: steps(6, end); }
+:root .roll-button.is-busted { --button-glow: 0 0 0 3px #a83f4526, 0 0 0 6px #a83f4510; border-color: #a84f49; }
+:root .roll-button.is-busted > span { color: #f39d94; font-size: 20px; }
+:root .roll-button.is-busted:enabled:hover, :root .roll-button.is-busted:focus-visible { --button-glow: 0 0 0 3px #a83f4555, 0 0 0 7px #a83f452b; }
+:root .roll-button.is-busted:focus-visible { outline-color: #f39d94; }
+:root .game-status { color: #6d5146; font-size: 19px; line-height: 1.05; }
+:root .rolling-dots { font-size: 30px; }
+:root .daily-status { border-color: #b5856c; }
+:root .daily-status p { color: #795b50; font-size: 17px; line-height: 1.2; }
+:root .daily-status .reset-label { font-size: 15px; }
+:root .reset-label time { border-radius: 0; border-color: #b18a70; background: #ffead5; color: #386747; box-shadow: 3px 3px 0 #c18d70; font-size: 24px; line-height: 1; }
+:root .reset-label span { color: #88634f; font-size: 15px; }
+:root .site-footer { color: #87634f; font-size: 14px; letter-spacing: .04em; }
+
+/* Profile/history, account forms, help, and welcome match the arcade skin. */
+:root .eyebrow { color: #795b50; }
+:root .profile-local-badge, :root .profile-account, :root .profile-error, :root .profile-roll, :root .history-count, :root .history-outcome, :root .account-settings, :root .account-modal .account-status { border-radius: 0; border-color: #b28b71; background: #fae0c7; box-shadow: 2px 2px 0 #cca184; }
+:root .profile-local-badge, :root .history-count { color: #6f5347; font-size: 15px; }
+:root .profile-metric .eyebrow { font-size: 15px; line-height: 1; }
+:root .profile-metric > strong { color: #386747; font-size: 58px; line-height: 1; letter-spacing: .01em; }
+:root .profile-metric > p:last-child, :root .profile-lifetime { color: #795b50; font-size: 18px; line-height: 1.15; }
+:root .profile-lifetime strong { font-size: 20px; color: #332d2b; }
+:root .profile-panel h3 { font-size: 16px; line-height: 1.5; }
+:root .profile-panel-header .eyebrow { font-size: 14px; }
+:root .profile-play-link { color: #386747; font-size: 18px; }
+:root .stats-grid strong { color: #386747; font-size: 38px; }
+:root .stats-grid span { color: #795b50; font-size: 17px; }
+:root .profile-today-stats strong { font-size: 44px; line-height: 1; }
+:root .profile-today-stats #stat-status { font-size: 25px; line-height: 44px; }
+:root .profile-roll-label { font-size: 15px; }
+:root .profile-roll { color: #386747; font-size: 18px; }
+:root .profile-roll.is-bust, :root .history-outcome.busted { background: #f7d0bd; color: #a83f45; border-color: #b67369; }
+:root .profile-today-note, :root .profile-history-note, :root .profile-storage-note { color: #795b50; font-size: 18px; line-height: 1.2; }
+:root .history-empty > span { color: #9d5f35; }
+:root .history-empty h4 { color: #332d2b; font-family: var(--arcade-display) !important; font-size: 15px; line-height: 1.5; }
+:root .history-empty p { color: #795b50; font-size: 19px; line-height: 1.2; }
+:root .history-table th { color: #795b50; font-size: 15px; border-color: #b98d74; letter-spacing: .03em; }
+:root .history-table td { color: #534137; font-size: 18px; border-color: #d8b59a; }
+:root .history-table .history-number { font-size: 22px; }
+:root .history-table td:nth-child(2) { color: #386747; }
+:root .history-outcome { color: #6f5347; font-size: 15px; }
+:root .history-outcome.in-progress { background: #d5dfb9; color: #315b3e; border-color: #7c936b; }
+:root .history-pagination p { color: #795b50; font-size: 17px; }
+:root .history-page-button { border-radius: 0; border-color: #a47c65; background: #ffe7cc; color: #386747; box-shadow: 2px 2px 0 #bd8d72; }
+:root .profile-account p { color: #634c40; font-size: 19px; line-height: 1.2; }
+:root .profile-account #profile-account-status { color: #795b50; font-size: 17px; }
+:root .profile-hero #profile-account-status { color: #795b50; font-size: 17px; }
+:root .account-action, :root .account-tabs button { border-radius: 0; border-color: #7d8f6d; background: #e0e6c9; color: #315c3f; box-shadow: 3px 3px 0 #b18b6e; font-size: 18px; }
+:root .account-tabs button { color: #795b50; background: #f6dfc7; border-color: #b18a70; }
+:root .account-tabs button[aria-pressed="true"] { color: #315c3f; background: #d6e0bd; border-color: #64825b; }
+:root .account-auth-links button, :root .account-dismiss { color: #446747; font-size: 17px; }
+:root .account-modal label { color: #332d2b; font-size: 18px; }
+:root .account-modal input { border-radius: 0; border-color: #a4836e; background: #fff7eb; color: #332d2b; font-size: 21px; }
+:root .account-modal input::placeholder { color: #9b8170; }
+:root .account-settings summary { color: #386747; font-size: 19px; }
+:root .account-modal .account-field-hint, :root .account-modal .account-note { color: #795b50; font-size: 17px; line-height: 1.15; }
+:root .account-modal .account-username-display { color: #386747; font-size: 25px; }
+:root .account-settings-form { border-color: #b28b71; }
+:root .modal { border: 2px solid #6b5246; border-radius: 0; background: #fff0dd; box-shadow: 6px 6px 0 #936b56, inset 0 2px 0 #fff9ef; }
+:root .modal::backdrop { background: #392921a8; backdrop-filter: none; }
+:root .modal h2 { color: #332d2b; font-size: 21px; line-height: 1.5; }
+:root .modal p:not(.eyebrow) { color: #765b4d; font-size: 20px; line-height: 1.2; }
+:root .modal .eyebrow { font-size: 15px; }
+:root .modal-close { border-radius: 0; border-color: #a98268; background: #f8dfc3; color: #493931; box-shadow: 2px 2px 0 #c29b7c; font-size: 24px; }
+:root .legend { color: #6b5044; font-size: 19px; }
+:root .legend-tile { border-radius: 0; border-color: #a8836b; }
+:root .legend-tile.exact { background: #cadbb3; color: #31593e; }
+:root .legend-tile.close { background: #f8d1bc; color: #a83f45; }
+#welcome-title { background: none; color: #332d2b; font-family: var(--arcade-display) !important; font-size: 32px; line-height: 1.4; letter-spacing: -.04em; text-shadow: 3px 3px 0 #dbc0a5; }
+#welcome-title:focus { outline: none; }
+#welcome-title span { color: #a14a32; }
+#welcome-modal .eyebrow { color: #795b50; font-size: 18px; }
+#welcome-modal .welcome-odds { color: #386747; font-size: 20px; }
+#welcome-modal .welcome-copy p { color: #765b4d; font-size: 20px; line-height: 1.2; }
+#welcome-modal strong { color: #332d2b; font-weight: 400; }
+#welcome-modal .welcome-note { border-radius: 0; border-color: #bc967a; background: #f5dfc8; color: #795b50; box-shadow: inset 2px 2px 0 #dcc0a2; font-size: 18px; line-height: 1.2; }
+:root .welcome-play { border: 2px solid #48674c; border-radius: 0; background: #c9dcb3; color: #294b34; box-shadow: inset 0 3px 0 #eef1d2, 0 5px 0 #81956c, 0 9px 0 #b98e6e; font-size: 12px; line-height: 1.5; }
+:root .welcome-play:focus { outline: none; }
+:root .welcome-play:focus-visible { box-shadow: inset 0 0 0 2px #48674c, inset 0 3px 0 #eef1d2, 0 5px 0 #81956c, 0 9px 0 #b98e6e; }
+:root .welcome-play:active { box-shadow: 0 2px 0 #81956c, 0 6px 0 #b98e6e; }
+:root .welcome-rules { color: #795b50; font-size: 18px; }
+
+@media (max-width: 560px) {
+  :root h1 { font-size: 14px; }
+  :root .brand-lockup .eyebrow { font-size: 12px; letter-spacing: 0; }
+  :root .nav-link { font-size: 16px; }
+  :root .game-hero .lede { font-size: 17px; }
+  :root .game-hero .round-label { font-size: 13px; }
+  :root .score-row .eyebrow { font-size: 12px; }
+  :root .score { font-size: 58px; }
+  :root .roll-count { font-size: 50px; }
+  :root .play-best { font-size: 16px; }
+  :root .game-status { font-size: 17px; }
+  :root .daily-status p { font-size: 16px; }
+  :root .site-footer { font-size: 12px; }
+  :root .profile-panel h3 { font-size: 14px; }
+  :root .profile-panel-header { gap: 10px; }
+  :root .profile-play-link { font-size: 16px; }
+  :root .history-table th { font-size: 13px; }
+  :root .history-table td { font-size: 16px; }
+  :root .history-outcome { font-size: 13px; }
+  #welcome-title { font-size: 27px; }
+}
+@media (max-height: 780px) {
+  :root .game-hero h2 { font-size: clamp(14px, 3.5vw, 24px); }
+  :root .game-hero .lede { font-size: 17px; }
+  :root .score { font-size: 48px; }
+  :root .roll-count { font-size: 44px; }
+  :root .play-best { font-size: 15px; }
+  :root .roll-button > span, :root .roll-button.is-busted > span { font-size: 17px; }
+  :root .roll-button small { font-size: 12px; }
+  :root .game-status { font-size: 17px; }
+  :root .daily-status p { font-size: 15px; }
+  :root .daily-status .reset-label { font-size: 13px; }
+  :root .reset-label time { font-size: 20px; }
+  :root .reset-label span { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .die.rolling, .die.rolling .die-cube, :root .roll-button.is-awaiting-roll::after { animation: none; }
+  :root .die.rolling { background-image: var(--rest-face); }
+  .die.rolling .die-cube, .die.rolling .die-cube-stage { display: none; }
+  .die.rolling::before, .die.rolling::after { display: none; }
+}
+@media (max-height: 700px) {
+  :root .game-hero .lede { font-size: 15px; line-height: 1.1; }
+  :root .score { font-size: 38px; }
+  :root .roll-count { font-size: 34px; }
+  :root .score-row .eyebrow { font-size: 12px; }
+  :root .play-best { font-size: 14px; }
+  :root .bust-warning { font-size: 12px; }
+  :root .roll-result { font-size: 15px; }
+  :root .game-status { font-size: 15px; }
+  :root .daily-status p { font-size: 14px; line-height: 1.1; }
+  :root .daily-status .reset-label { font-size: 12px; }
+  :root .reset-label time { font-size: 18px; }
+  :root .reset-label span { font-size: 12px; }
+}
