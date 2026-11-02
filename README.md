@@ -50,6 +50,10 @@ and restoration instructions. The backup is not published to the website.
 - A profile with personal bests, today's run, roll-by-roll results, and paginated score history
 - Unique usernames, email/password sign-in with email confirmation, saved account scores, and guest score import
 
+`sound.js` generates the chiptune effects locally with Web Audio after player
+interaction. The speaker button beside account/help controls mutes every effect,
+including achievement chimes, and saves its setting for this browser.
+
 ## Optional email accounts
 
 Select the account icon in the header, or **Sign in / create account** on your profile. New players choose a unique username, email, and password, then confirm their email before signing in. Sign-in uses email and password; usernames appear on profiles. Usernames contain 3–24 letters, numbers, or underscores and are unique regardless of capitalization. New passwords require at least 8 characters. Signed-in runs and history are saved to that account. Guest play is still available.

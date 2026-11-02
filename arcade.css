@@ -254,3 +254,10 @@ body::before { background-image: repeating-linear-gradient(0deg, transparent 0 3
   .run-messages.is-bust-revealed { animation: bust-messages-fade .2s ease-out both; }
   @keyframes bust-messages-fade { from { opacity: 0; } to { opacity: 1; } }
 }
+@media (max-width: 360px) {
+  .site-header .brand-lockup { gap: 8px; }
+  .site-header .brand-mark { width: 32px; height: 32px; }
+  :root .site-header .brand-lockup .eyebrow { font-size: 10px; letter-spacing: 0; }
+  .site-header .header-actions { gap: 6px; }
+  .site-header .icon-button { width: 32px; height: 32px; padding: 0; }
+}
