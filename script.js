@@ -9,6 +9,8 @@ const rollButtonLabel = document.querySelector("#roll-button-label");
 const rollButtonCaption = document.querySelector("#roll-button-caption");
 const dailyMessage = document.querySelector("#daily-message");
 const dailyStatus = document.querySelector("#daily-status");
+const runMessages = document.querySelector("#run-messages");
+const rollCount = document.querySelector("#roll-count");
 const countdown = document.querySelector("#reset-countdown");
 const welcomeModal = document.querySelector("#welcome-modal");
 const welcomePlay = document.querySelector("#welcome-play");
@@ -22,7 +24,9 @@ const achievementsLink = document.querySelector("#achievements-link");
 const accounts = new DicedleAccounts(window.DICEDLE_CONFIG);
 const scoreHistory = new DicedleHistory(() => accounts.storage);
 const achievementBook = new DicedleAchievements(() => accounts.storage);
+const sound = new DicedleSound(document.querySelector("#sound-button"));
 const achievementView = new DicedleAchievementsView();
+const diceEffects = new DicedleDiceEffects();
 let achievementScope = accounts.storage.namespace;
 let achievementScopeRevision = 0;
 const storageKey = scoreHistory.runKey;
@@ -66,6 +70,65 @@ let isRolling = false;
 let hasRolledThisVisit = false;
 let rollTimer;
 let rollVersion = 0;
+let bustMessageKey = null;
+
+function renderRollTallies(count) {
+  if (rollCount.dataset.count === String(count)) return;
+  rollCount.dataset.count = count;
+  rollCount.setAttribute("aria-label", `${count} roll${count === 1 ? "" : "s"}`);
+  const marks = document.createDocumentFragment();
+  const svgNamespace = "http://www.w3.org/2000/svg";
+  const variation = seed => (Math.sin(seed * 127.1 + 19.7) * 43758.5453) % 1;
+  for (let group = 0; group < Math.ceil(count / 5); group++) {
+    const tally = document.createElementNS(svgNamespace, "svg");
+    tally.classList.add("tally-group");
+    tally.setAttribute("viewBox", "0 0 48 38");
+    tally.setAttribute("aria-hidden", "true");
+    const groupCount = Math.min(5, count - group * 5);
+    for (let mark = 0; mark < groupCount; mark++) {
+      const seed = group * 5 + mark + 1;
+      const scratch = document.createElementNS(svgNamespace, "path");
+      const startX = mark === 4 ? 3 : 8 + mark * 10 + variation(seed) * 1.7;
+      const startY = mark === 4 ? 29 + variation(seed + 3) : 5 + variation(seed + 2) * 2;
+      const endX = mark === 4 ? 44 : startX + variation(seed + 4) * 3;
+      const endY = mark === 4 ? 8 + variation(seed + 5) * 2 : 32 + variation(seed + 6) * 2;
+      const midX = (startX + endX) / 2 + variation(seed + 7);
+      const midY = (startY + endY) / 2;
+      scratch.setAttribute("d", `M${startX} ${startY} L${startX + 1.1} ${startY + 2} Q${midX + 1.2} ${midY} ${endX + .9} ${endY - 1} L${endX} ${endY} L${endX - .9} ${endY - 2} Q${midX - 1} ${midY + 1} ${startX - .6} ${startY + 3} Z`);
+      const highlight = scratch.cloneNode();
+      highlight.setAttribute("fill", "#ffe7ce");
+      highlight.setAttribute("transform", "translate(1.1 1.2)");
+      scratch.setAttribute("fill", seed % 3 === 0 ? "#684a3d" : "#795443");
+      tally.append(highlight, scratch);
+    }
+    marks.append(tally);
+  }
+  if (!count) {
+    const empty = document.createElement("span");
+    empty.className = "tally-empty";
+    empty.setAttribute("aria-hidden", "true");
+    empty.textContent = "\u2014";
+    marks.append(empty);
+  }
+  rollCount.replaceChildren(marks);
+  rollCount.scrollLeft = rollCount.scrollWidth;
+}
+
+function updateBustMessages(busted) {
+  if (!busted || isRolling || storageError || dailyRun.date !== localDateKey()) {
+    bustMessageKey = null;
+    runMessages.classList.remove("is-bust-revealed");
+    diceEffects.clearBust();
+    return;
+  }
+  const key = accounts.storage.namespace + JSON.stringify(dailyRun);
+  if (key === bustMessageKey) return;
+  bustMessageKey = key;
+  diceEffects.clearBust();
+  runMessages.classList.remove("is-bust-revealed");
+  void runMessages.offsetWidth;
+  runMessages.classList.add("is-bust-revealed");
+}
 
 function localDateKey(date = new Date()) {
   const year = date.getFullYear();
@@ -97,12 +160,7 @@ function readDailyRun() {
   rememberRunHistory(run);
   if (run.date !== date) return { date, rolls: [] };
 
-  const validRolls = Array.isArray(run.rolls) && run.rolls.every((dice, index) => (
-    Array.isArray(dice) && dice.length === 2 &&
-    dice.every((value) => Number.isInteger(value) && value >= 1 && value <= 6) &&
-    (rollTotal(dice) !== 7 || index === run.rolls.length - 1)
-  ));
-  if (!validRolls) throw new Error("Invalid saved dice");
+  if (!scoreHistory.validRun(run)) throw new Error("Invalid saved dice");
   return run;
 }
 
@@ -196,12 +254,16 @@ function prepareTumblingDie(die, value, duration, previousValue = value) {
 }
 
 function renderGame() {
-  const score = dailyRun.rolls.reduce((sum, dice) => sum + rollTotal(dice), 0);
+  const scoring = DicedleScoring.analyze(dailyRun);
+  const score = scoring.total;
   const busted = isBusted(dailyRun);
   const lastRoll = dailyRun.rolls[dailyRun.rolls.length - 1];
+  const lastAward = scoring.rolls.at(-1);
+  updateBustMessages(busted);
   dailyStatus.hidden = !busted || dailyRun.date !== localDateKey() || isRolling || Boolean(storageError);
 
   scoreElement.textContent = score;
+  scoreElement.style.setProperty("--score-digits", String(score).length);
   scoreLabel.textContent = busted ? "FINAL SCORE" : "CURRENT SCORE";
   showDice(...(lastRoll || [1, 1]), Boolean(lastRoll));
   dieOne.classList.toggle("bust", busted);
@@ -212,7 +274,11 @@ function renderGame() {
   document.querySelector(".game-card").classList.toggle("is-busted", busted);
   rollButtonLabel.textContent = busted ? "BUSTED" : "ROLL";
   rollButtonCaption.textContent = busted ? "this run is over" : "take your chance";
-  rollResult.textContent = lastRoll ? `+${rollTotal(lastRoll)}` : "Ready when you are";
+  rollResult.textContent = lastAward
+    ? `+${lastAward.points.toLocaleString()}${lastAward.multiplier > 1 ? ` (${lastAward.raw} × ${lastAward.multiplier.toLocaleString()})` : ""}`
+    : "Ready when you are";
+  rollResult.classList.toggle("has-bonus", Boolean(lastAward?.bonus));
+  diceEffects.setFire(busted ? 1 : scoring.nextMultiplier);
 
   if (storageError) {
     status.textContent = storageError;
@@ -229,16 +295,19 @@ function renderGame() {
     status.textContent = "Every roll adds to your score. Seven ends the run.";
     dailyMessage.textContent = "One run per day. Make it count.";
   }
+  if (!storageError && lastAward?.bonus) status.textContent += ` ${lastAward.raw} × ${lastAward.multiplier.toLocaleString()} = ${lastAward.points.toLocaleString()} points.`;
+  if (!storageError && !busted && scoring.pending) status.textContent += ` Doubles! The next roll scores ${scoring.nextMultiplier.toLocaleString()}×.`;
 
   document.querySelector("#daily-date").textContent = new Date().toLocaleDateString(undefined, {
     month: "short", day: "numeric", year: "numeric",
   });
-  document.querySelector("#roll-count").textContent = dailyRun.rolls.length;
+  renderRollTallies(dailyRun.rolls.length);
   welcomePlay.textContent = busted ? "View today's score →" : lastRoll ? "Resume today's run →" : "Roll to play →";
   renderProfile();
 }
 
 function syncDailyRun() {
+  sound.stop("roll", true);
   window.clearTimeout(rollTimer);
   rollVersion += 1;
   isRolling = false;
@@ -261,9 +330,11 @@ function syncDailyRun() {
 async function roll() {
   if (dailyRun.date !== localDateKey()) syncDailyRun();
   if (isRolling || accounts.busy || storageError || isBusted(dailyRun) || document.querySelector("dialog[open]")) return;
+  sound.unlock();
 
   const version = ++rollVersion;
   isRolling = true;
+  diceEffects.clearCelebration();
   hasRolledThisVisit = true;
   rollButton.classList.remove("is-awaiting-roll");
   rollButton.disabled = true;
@@ -278,8 +349,10 @@ async function roll() {
       const next = {
         date: latest.date,
         id: latest.date,
+        ...DicedleScoring.nextRules(latest),
         rolls: [...latest.rolls, randomDice(latest.rolls.length)],
       };
+      if (!Number.isSafeInteger(DicedleScoring.analyze(next).total)) throw new Error("Score is outside the supported range");
       if (isBusted(next)) {
         next.gameOverMessageIndex = Math.floor(Math.random() * gameOverMessages.length);
       } else {
@@ -308,6 +381,7 @@ async function roll() {
     }
 
     const finalDice = dailyRun.rolls[dailyRun.rolls.length - 1];
+    const award = DicedleScoring.analyze(dailyRun).rolls.at(-1);
     const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 180 : rollDuration;
     const previousDice = [Number(dieOne.dataset.value), Number(dieTwo.dataset.value)];
     showDice(...finalDice);
@@ -318,15 +392,23 @@ async function roll() {
     void dieOne.offsetWidth;
     dieOne.classList.add("rolling");
     dieTwo.classList.add("rolling");
+    diceEffects.setFire(award.multiplier, true);
+    sound.play("roll", { duration: duration / 1000 });
     rollResult.textContent = "Rolling...";
     status.innerHTML = '<span class="sr-only">Rolling the dice</span><span class="rolling-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>';
     rollTimer = window.setTimeout(() => {
-      if (version === rollVersion) syncDailyRun();
+      if (version === rollVersion) {
+        syncDailyRun();
+        if (!storageError && dailyRun.date === localDateKey()) sound.playResult(award);
+        if (award.bonus) diceEffects.celebrate(award);
+        if (award.raw === 7 && isBusted(dailyRun) && !storageError
+          && dailyRun.date === localDateKey()) diceEffects.playBust();
+      }
     }, duration);
-  } catch {
+  } catch (error) {
     if (version !== rollVersion) return;
     isRolling = false;
-    storageError = accounts.user
+    storageError = error.code === "SCORING_UPDATE_REQUIRED" ? error.message : accounts.user
       ? "Your roll could not be confirmed. Reconnect, then sync scores from your account before rolling again."
       : "Your roll could not be saved. Allow saved site data in your browser, then reload to play.";
     renderGame();
@@ -387,7 +469,6 @@ function renderProfile() {
 
   const stats = data.stats;
   document.querySelector("#play-best-score").textContent = profileNumber(stats.bestScore ?? 0);
-  document.querySelector("#play-best-streak").textContent = profileNumber(stats.mostRolls ?? 0);
   document.querySelector("#profile-best-score").textContent = profileNumber(stats.bestScore);
   document.querySelector("#profile-best-rolls").textContent = profileNumber(stats.mostRolls);
   document.querySelector("#profile-runs-played").textContent = profileNumber(stats.runsPlayed);
@@ -401,7 +482,8 @@ function renderProfile() {
 
   const current = data.currentRun;
   const rolls = current?.rolls || [];
-  const runScore = rolls.reduce((sum, dice) => sum + rollTotal(dice), 0);
+  const scoring = DicedleScoring.analyze(current || { rolls: [] });
+  const runScore = scoring.total;
   const averageRollScore = rolls.length ? runScore / rolls.length : null;
   const busted = Boolean(current && isBusted(current));
   document.querySelector("#profile-today-date").textContent = profileDate(localDateKey());
@@ -415,10 +497,10 @@ function renderProfile() {
     : rolls.length ? "Your progress is saved. Keep rolling when you're ready." : "Your first roll starts today's story.";
   const rollChips = rolls.map((dice, index) => {
     const chip = document.createElement("li");
-    const total = rollTotal(dice);
-    chip.className = total === 7 ? "profile-roll is-bust" : "profile-roll";
-    chip.textContent = `+${total}`;
-    chip.setAttribute("aria-label", `Roll ${index + 1}: ${dice[0]} plus ${dice[1]} equals ${total}${total === 7 ? ", bust" : ""}`);
+    const award = scoring.rolls[index];
+    chip.className = "profile-roll" + (award.raw === 7 ? " is-bust" : "") + (award.bonus ? " is-bonus" : "");
+    chip.textContent = `+${award.points.toLocaleString()}${award.bonus ? ` (${award.multiplier.toLocaleString()}×)` : ""}`;
+    chip.setAttribute("aria-label", `Roll ${index + 1}: ${dice[0]} plus ${dice[1]} equals ${award.raw}, ${award.points} points${award.bonus ? ` with a ${award.multiplier} times bonus` : ""}${award.raw === 7 ? ", bust" : ""}`);
     return chip;
   });
   document.querySelector("#profile-today-rolls").replaceChildren(...rollChips);
@@ -478,6 +560,7 @@ function refreshAchievements(data) {
 function showPage(moveFocus = false) {
   const route = window.location.hash === "#profile" ? "profile" : window.location.hash === "#achievements" ? "achievements" : "play";
   document.body.classList.toggle("is-play-page", route === "play");
+  diceEffects.setVisible(route === "play");
   for (const [name, page, link] of [["play", playPage, playLink], ["profile", profilePage, profileLink], ["achievements", achievementsPage, achievementsLink]]) {
     page.hidden = name !== route;
     if (name === route) link.setAttribute("aria-current", "page");

@@ -46,15 +46,16 @@
 .achievements-empty { padding: 36px 20px; border: 2px dashed #b28b71; margin-top: 24px; text-align: center; color: #795b50; }
 .achievements-footnote { margin: 28px 0; color: #795b50; font-size: 17px; line-height: 1.3; }
 #achievements-title:focus { outline: none; }
-#achievement-toasts { position: fixed; inset: auto 22px 22px auto; z-index: 1000; width: min(410px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; margin: 0; padding: 0 5px 5px 0; border: 0; background: transparent; color: #332d2b; }
-.achievement-toast { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 25px; gap: 12px; padding: 18px; border: 2px solid #64825b; background: #fff0dd; box-shadow: 4px 4px 0 #a9b48b; animation: achievement-arrive .22s ease-out; }
-.achievement-toast-label { margin: 0 0 8px; color: #386747; font-size: 16px; }
-.achievement-toast strong { display: block; font-family: var(--arcade-display) !important; font-size: 10px; line-height: 1.6; overflow-wrap: anywhere; }
-.achievement-toast strong + p { margin: 10px 0; color: #795b50; font-size: 17px; line-height: 1.15; }
-.achievement-toast a { color: #386747; font-size: 17px; text-underline-offset: 3px; }
-.achievement-toast-close { width: 26px; height: 30px; align-self: start; border: 1px solid #b18a70; background: #f6dfc7; color: #795b50; cursor: pointer; font-size: 22px; line-height: 1; }
+#achievement-toasts { position: fixed; inset: 50% max(6px, env(safe-area-inset-right)) auto auto; transform: translateY(-50%); z-index: 1000; width: max-content; max-width: calc(100vw - 12px); max-height: calc(100dvh - 28px); overflow: hidden; margin: 0; padding: 8px; border: 0; background: transparent; color: #332d2b; }
+.achievement-toast { position: relative; max-width: 260px; padding: 11px 14px; border: 1px solid #89a57a; border-radius: 6px; background: #fff4e4; box-shadow: 0 3px 12px #493a3229; animation: achievement-arrive .34s cubic-bezier(.16, 1, .3, 1) both, achievement-notice .75s ease-out .12s; }
+.achievement-toast-label { display: block; margin-bottom: 5px; color: #627953; font-size: 14px; line-height: 1; letter-spacing: .02em; }
+.achievement-toast-name { display: block; min-width: 0; color: #386747; font-family: var(--arcade-display) !important; font-size: 8px; line-height: 1.6; overflow-wrap: anywhere; text-decoration: none; }
+.achievement-toast-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.achievement-toast.is-leaving { pointer-events: none; animation: achievement-depart .26s ease-in both; }
 .achievements-page button:focus-visible, .achievements-page input:focus-visible, .achievements-page select:focus-visible, .achievement-toast :focus-visible { outline: 2px solid #386747; outline-offset: 3px; }
-@keyframes achievement-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes achievement-arrive { from { opacity: 0; transform: translateX(calc(100% + 32px)); } to { opacity: 1; transform: translateX(0); } }
+@keyframes achievement-depart { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(calc(100% + 32px)); } }
+@keyframes achievement-notice { 0%, 100% { border-color: #89a57a; background: #fff4e4; box-shadow: 0 3px 12px #493a3229; } 30% { border-color: #5d8b4f; background: #e1efcf; box-shadow: 0 3px 12px #8abe6b80; } }
 @media (max-width: 900px) {
   .site-header { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand actions" "nav nav"; gap: 12px 16px; }
   .achievement-toolbar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -74,8 +75,5 @@
   .achievement-filters { flex-wrap: wrap; }
   .achievement-card { padding: 16px; gap: 12px; }
   .achievement-results-meta { flex-wrap: wrap; }
-  #achievement-toasts { right: 12px; bottom: 12px; width: calc(100vw - 24px); }
-  .achievement-toast { padding: 14px; grid-template-columns: 36px minmax(0, 1fr) 25px; gap: 10px; }
-  .achievement-toast .achievement-icon { width: 36px; height: 36px; padding: 7px; }
 }
-@media (prefers-reduced-motion: reduce) { .achievement-toast { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .achievement-toast, .achievement-toast.is-leaving { animation: none; } }

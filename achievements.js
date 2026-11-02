@@ -179,9 +179,9 @@ function dicedleAchievementContext(data) {
     previous = record;
 
     // Summary-only history can award score milestones, but cannot invent dice patterns.
-    const run = { date: record.date, rolls: record.rolls };
+    const run = { date: record.date, rolls: record.rolls, ...DicedleScoring.metadata(record) };
     if (!validator.validRun(run) || !run.rolls.length || run.rolls.length !== record.rollCount
-      || run.rolls.reduce((sum, pair) => sum + pair[0] + pair[1], 0) !== record.score) continue;
+      || DicedleScoring.analyze(run).total !== record.score) continue;
     const ended = run.rolls.at(-1)[0] + run.rolls.at(-1)[1] === 7;
     if (ended !== busted) continue;
     const totals = new Set(), doubles = new Set(), left = new Set(), right = new Set();

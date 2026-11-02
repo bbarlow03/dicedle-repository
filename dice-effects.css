@@ -1,0 +1,51 @@
+/* Fire and scoring effects leave the dice geometry and layout in place. */
+.dice-stage { position: relative; isolation: isolate; }
+.die-shell { position: relative; flex: 0 0 auto; width: var(--play-die-size, 106px); height: var(--play-die-size, 106px); }
+.die-shell .die { width: 100%; height: 100%; position: relative; z-index: 2; }
+.dice-stage .plus { position: relative; z-index: 3; }
+.fire-filter { position: absolute; pointer-events: none; }
+.die-fire { display: none; position: absolute; pointer-events: none; left: -50%; top: -147%; width: 200%; height: 260%; overflow: hidden; z-index: 0; }
+.die-fire-video { position: absolute; left: -110%; top: 0; width: 320%; height: 100%; max-width: none; object-fit: fill; filter: url(#fire-remove-black); }
+.is-on-fire .die-fire { display: block; }
+.die-shell::before { content: ""; pointer-events: none; position: absolute; inset: -5%; z-index: -1; opacity: 0; border-radius: 24%; background: #ef6b252b; box-shadow: 0 0 20px 6px #f075263b; }
+.is-on-fire .die-shell::before { opacity: 1; animation: ember-glow 1.25s ease-in-out infinite alternate; }
+.bonus-indicator { position: absolute; z-index: 8; left: 50%; bottom: -8px; transform: translateX(-50%); white-space: nowrap; padding: 3px 9px; border: 1px solid #ae682d; background: #fff0c7; color: #824b20; box-shadow: 2px 2px 0 #c18b51; font-size: 16px; line-height: 1; letter-spacing: .03em; }
+:root .roll-result.has-bonus { border-color: #ae682d; box-shadow: 3px 3px 0 #d0a15e; }
+.bust-warning { position: relative; z-index: 6; }
+.game-card { position: relative; }
+.bonus-burst { position: absolute; z-index: 15; top: 47%; left: 50%; width: max-content; max-width: 100%; pointer-events: none; text-align: center; color: #ffe892; text-shadow: 2px 2px 0 #6b381a, -1px -1px 0 #6b381a, 1px -1px 0 #6b381a, -1px 1px 0 #6b381a; animation: bonus-rise 1.3s ease-out both; }
+:root .bonus-burst strong { display: block; font-family: var(--arcade-display) !important; font-size: 18px; line-height: 1.6; }
+.bonus-burst > span { display: block; font-size: 21px; line-height: 1.1; letter-spacing: .03em; }
+.bonus-burst i { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; background: #ffc447; box-shadow: 2px 2px 0 #a95427; animation: bonus-spark .95s ease-out both; }
+.bonus-burst i:nth-of-type(2n) { background: #ffec9a; width: 4px; height: 4px; }
+.is-bonus-awarded .score-plaque { animation: bonus-plaque .85s ease-out; }
+.is-bonus-awarded .score { animation: bonus-number .55s ease-out; }
+:root .profile-roll.is-bonus { border-color: #b18a40; box-shadow: 2px 2px 0 #d5b172; }
+@keyframes ember-glow { from { opacity: .5; transform: scale(.95); } to { opacity: 1; transform: scale(1.04); } }
+@keyframes bonus-rise { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.75); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.08); } 65% { opacity: 1; transform: translate(-50%, -60px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -105px) scale(.97); } }
+@keyframes bonus-spark { 0% { opacity: 1; transform: translate(0, 0) scale(1.5); } 100% { opacity: 0; transform: translate(var(--spark-x), var(--spark-y)) scale(.3); } }
+@keyframes bonus-plaque { 15% { box-shadow: 0 0 0 3px #d58d3e, 0 0 26px #ed9c4c9c; } }
+@keyframes bonus-number { 30% { transform: scale(1.16); } }
+/* A short, local blast marks the instant a live roll lands on seven. */
+.bust-impact { --blast-size: min(360px, calc(100vw - 28px)); position: absolute; z-index: 7; left: 50%; top: 50%; width: var(--blast-size); height: var(--blast-size); transform: translate(-50%, -50%); pointer-events: none; }
+.bust-flash { position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, #ffe0a6a6 0%, #d06b424d 34%, transparent 68%); animation: bust-flash .48s ease-out both; }
+.bust-wave { position: absolute; inset: 8%; border: 3px solid #bb5145; border-radius: 50%; box-shadow: inset 0 0 0 1px #ffd39099, 0 0 14px #d46d4b55; animation: bust-shockwave .85s cubic-bezier(.12, .65, .22, 1) both; }
+.bust-wave-echo { inset: 16%; border-width: 2px; border-color: #df9c50; animation-delay: .11s; }
+.bust-impact i { position: absolute; left: 50%; top: 50%; width: 5px; height: 7px; background: #b74e40; box-shadow: 1px 1px 0 #f5bc70; animation: bust-fragment .8s ease-out var(--blast-delay) both; }
+.bust-impact i:nth-of-type(2n) { width: 4px; height: 4px; background: #d89140; }
+.dice-stage.is-bust-impact .die-shell { --impact-direction: -1; animation: bust-dice-jolt .4s ease-out; }
+.dice-stage.is-bust-impact .die-shell:nth-child(3) { --impact-direction: 1; }
+.game-card.is-bust-impact .roll-button { animation: bust-button-hit .45s ease-out; }
+@keyframes bust-flash { 0% { opacity: 0; transform: scale(.35); } 20% { opacity: 1; } 100% { opacity: 0; transform: scale(1.12); } }
+@keyframes bust-shockwave { 0% { opacity: .95; transform: scale(.16); } 70% { opacity: .5; } 100% { opacity: 0; transform: scale(1); } }
+@keyframes bust-fragment { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); } 12% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(var(--blast-x) * var(--blast-size)), calc(var(--blast-y) * var(--blast-size))) rotate(var(--blast-turn)) scale(.4); } }
+@keyframes bust-dice-jolt { 0%, 100% { transform: none; } 20% { transform: translateX(calc(var(--impact-direction) * 4px)) rotate(calc(var(--impact-direction) * 5deg)) scale(1.04); } 55% { transform: translateX(calc(var(--impact-direction) * -2px)) rotate(calc(var(--impact-direction) * -2deg)); } }
+@keyframes bust-button-hit { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.035); } }
+@media (max-width: 560px) { :root .bonus-burst strong { font-size: 14px; } .bonus-burst > span { font-size: 18px; } .bonus-indicator { font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) {
+  .bust-impact { display: none; }
+  .dice-stage.is-bust-impact .die-shell, .game-card.is-bust-impact .roll-button { animation: none; }
+  .is-on-fire .die-shell::before, .bonus-burst, .bonus-burst i, .is-bonus-awarded .score-plaque, .is-bonus-awarded .score { animation: none; }
+  .bonus-burst { transform: translate(-50%, -35px); }
+  .bonus-burst i { display: none; }
+}

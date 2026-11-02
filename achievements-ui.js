@@ -24,7 +24,11 @@ class DicedleAchievementToasts {
     this.queue = [];
     this.current = null;
     this.timer = null;
-    this.remaining = 6000;
+    this.enterTimer = null;
+    this.exitTimer = null;
+    this.entering = false;
+    this.closing = false;
+    this.remaining = 2000;
     this.deadline = 0;
     host.addEventListener("mouseenter", () => this.pause());
     host.addEventListener("mouseleave", () => this.resume());
@@ -41,7 +45,6 @@ class DicedleAchievementToasts {
     if (achievements.length <= 3) this.queue.push(...achievements);
     else this.queue.push(...achievements.slice(0, 2), {
       name: `${achievements.length - 2} more achievements!`,
-      description: "Your collection just grew. Open the trophy room to see them all.",
       category: "scores", summary: true,
     });
     this.showNext();
@@ -51,31 +54,30 @@ class DicedleAchievementToasts {
     if (this.current || !this.queue.length || document.hidden) return;
     const achievement = this.queue.shift();
     this.current = achievement;
-    this.remaining = 6000;
+    this.remaining = 2000;
+    this.entering = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const toast = document.createElement("section");
     toast.className = "achievement-toast";
     toast.setAttribute("aria-label", "Achievement unlocked");
-    toast.append(dicedleAchievementIcon(achievement.category));
-    const copy = document.createElement("div");
-    const label = document.createElement("p");
+    const label = document.createElement("span");
     label.className = "achievement-toast-label";
-    label.textContent = achievement.summary ? "Collection updated" : achievement.secret ? "Secret achievement unlocked!" : "Achievement unlocked!";
-    const title = document.createElement("strong");
+    label.textContent = "Achievement Unlocked!";
+    const title = document.createElement("a");
+    title.className = "achievement-toast-name";
+    title.href = "#achievements";
     title.textContent = achievement.name;
-    const description = document.createElement("p");
-    description.textContent = achievement.description;
-    const link = document.createElement("a");
-    link.href = "#achievements";
-    link.textContent = "View achievements →";
-    link.addEventListener("click", () => this.dismiss());
-    copy.append(label, title, description, link);
-    const dismiss = document.createElement("button");
-    dismiss.type = "button";
-    dismiss.className = "achievement-toast-close";
-    dismiss.textContent = "x";
-    dismiss.setAttribute("aria-label", "Dismiss achievement notification");
-    dismiss.addEventListener("click", () => this.dismiss());
-    toast.append(copy, dismiss);
+    title.addEventListener("click", () => this.dismiss());
+    toast.append(label, title);
+    const arrived = () => {
+      if (this.host.firstElementChild !== toast || !this.entering) return;
+      clearTimeout(this.enterTimer);
+      this.enterTimer = null;
+      this.entering = false;
+      this.resume();
+    };
+    toast.addEventListener("animationend", event => {
+      if (event.target === toast && event.animationName === "achievement-arrive") arrived();
+    });
     this.host.replaceChildren(toast);
     this.host.hidden = false;
     const previousFocus = document.activeElement;
@@ -85,7 +87,9 @@ class DicedleAchievementToasts {
     if (document.activeElement !== previousFocus && previousFocus?.isConnected) {
       previousFocus.focus({ preventScroll: true });
     }
-    this.resume();
+    if (this.entering) this.enterTimer = setTimeout(arrived, 420);
+    else this.resume();
+    document.dispatchEvent(new CustomEvent("dicedle:achievement"));
   }
 
   pause() {
@@ -96,27 +100,51 @@ class DicedleAchievementToasts {
   }
 
   resume() {
-    if (!this.current || this.timer || document.hidden
+    if (!this.current || this.entering || this.closing || this.timer || document.hidden
       || this.host.matches(":hover") || this.host.contains(document.activeElement)) return;
     this.deadline = Date.now() + this.remaining;
     this.timer = setTimeout(() => this.dismiss(), this.remaining);
   }
 
   dismiss() {
+    if (!this.current || this.closing) return;
+    this.pause();
+    this.closing = true;
+    const toast = this.host.firstElementChild;
+    if (!toast || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      this.finishDismiss();
+      return;
+    }
+    toast.classList.add("is-leaving");
+    toast.addEventListener("animationend", event => {
+      if (event.target === toast && event.animationName === "achievement-depart"
+        && this.host.firstElementChild === toast) this.finishDismiss();
+    });
+    // Finish even if an animation is interrupted or disabled by browser settings.
+    this.exitTimer = setTimeout(() => this.finishDismiss(), 300);
+  }
+
+  finishDismiss(showNext = true) {
     clearTimeout(this.timer);
+    clearTimeout(this.enterTimer);
+    clearTimeout(this.exitTimer);
     this.timer = null;
+    this.enterTimer = null;
+    this.exitTimer = null;
     this.current = null;
+    this.entering = false;
+    this.closing = false;
     this.host.replaceChildren();
     if (this.host.hidePopover) {
       try { this.host.hidePopover(); } catch { /* Already closed. */ }
     }
     this.host.hidden = true;
-    this.showNext();
+    if (showNext) this.showNext();
   }
 
   clear() {
     this.queue.length = 0;
-    this.dismiss();
+    this.finishDismiss(false);
   }
 }
 

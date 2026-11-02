@@ -6,6 +6,27 @@ and must confirm their email. Existing players can still sign in by email link.
 
 ## Upgrade an existing Dicedle project
 
+### Doubles-bonus scoring update
+
+Before publishing the doubles-bonus browser files, run
+[doubles-bonus.sql](doubles-bonus.sql) once in the Supabase SQL Editor.
+It updates the run-scoring function and adds the scoring-version check.
+Re-running it is safe; existing score rows, usernames, and Auth users stay intact.
+
+The function computes stacking 2×, 4×, 8×, 16× bonuses from the dice themselves.
+The final seven receives the current multiplier before the run ends. New-rule
+runs keep their scoring version and activation index; historical scores retain
+their old rules. An unfinished legacy run switches on its next roll without
+changing points already earned. Stale clients cannot remove bonuses or move
+the activation boundary.
+
+The browser checks for version 2 before sending a new-rule run. Until this SQL
+upgrade is installed, account play reports that scoring is being updated;
+guest play works locally. New Supabase projects can use the complete
+[schema.sql](schema.sql), which already includes this update.
+
+### Username and password setup
+
 1. Run [usernames.sql](usernames.sql) in the Supabase SQL Editor. It adds the
    username table, uniqueness rules, and signup trigger. Existing scores and
    Auth users are preserved; running this migration again is safe.

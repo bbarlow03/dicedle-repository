@@ -38,13 +38,15 @@ and restoration instructions. The backup is not published to the website.
 
 - Responsive game shell and visual identity
 - Two animated dice with randomized rolls from 2–12
-- A score that accumulates on every roll, including the busting seven
-- Immediate bust when the dice total seven, after adding 7 points
+- A score that accumulates on every roll, with stacking doubles bonuses
+- Immediate bust when the dice total seven, after awarding its points and bonus
 - Welcome popup with Dicedle rules, plus help and PLAY / PROFILE / ACHIEVEMENTS navigation
 - One run per local calendar day, saved between page visits
 - Automatic unlock each new day and a live countdown to the next run
-- A pixel arcade theme, raised score displays, dice, and tactile buttons
+- A pixel arcade theme, one large score panel, scratched roll tallies, dice, and tactile buttons
 - A large BUSTED roll button that still presses but cannot change a finished run
+- Bust messages and the next-run countdown slide up as the dice land, with a shockwave and sparks for a live bust
+- Synthesized retro sounds for dice, landings, doubles, bonus payouts, busts, and achievement notifications; a top-right mute button remembers this browser's preference
 - A profile with personal bests, today's run, roll-by-roll results, and paginated score history
 - Unique usernames, email/password sign-in with email confirmation, saved account scores, and guest score import
 
@@ -81,9 +83,14 @@ has progress bars, collected dates, search, category selection, and status filte
 
 Achievements collect automatically from confirmed saved runs after the dice
 settle. Notifications appear on any page, including over open help/account
-dialogs, without taking keyboard focus. They dismiss after six seconds, pause
-while hovered, focused, or in a background tab, and include a link to the trophy
-room. Large batches show two individual awards and one summary notification.
+dialogs, without taking keyboard focus. Compact badges show "Achievement Unlocked!"
+above the achievement name, centered on the right edge to keep the roll button
+clear on mobile. They
+slide in with a brief green highlight, stay visible for two seconds, then slide
+back out to the right, pausing while hovered,
+focused, or in a background tab. Click the name to open the trophy room.
+Reduced-motion mode skips the sliding animation.
+Large batches show two individual awards and one summary notification.
 
 Guest unlocks are saved under `dicedle.achievements.v1.<achievement-id>`;
 accounts use their existing `dicedle.account.<user-id>.` storage namespace. Each
@@ -114,7 +121,44 @@ saves without accessing real scores or Supabase.
 
 The play page shows your saved best score and best streak beneath the current counters. A streak is the number of rolls in one run, including the final seven, matching the profile's most-rolls record. Personal bests update during a run and stay available after a refresh or a new day.
 
-Opening the welcome popup does not use your daily run. Your first roll starts it. You can resume an unfinished run in the same browser later that day. A seven adds 7 points and ends that day's run, with no play-again button.
+Opening the welcome popup does not use your daily run. Your first roll starts it. You can resume an unfinished run in the same browser later that day. A seven awards its points, including any active multiplier, and ends that day's run, with no play-again button.
+
+### Doubles and fire
+
+Doubles make the next roll worth 2× points. Consecutive doubles keep raising
+that next multiplier to 4×, 8×, 16×, and so on. A non-double earns the current
+multiplier and resets it. A seven earns its multiplied points, then busts.
+For example, double threes score 6 and arm 2×; a following 10 scores 20.
+Double ones, double twos, double threes, and a 10 score 2 + 8 + 24 + 80.
+
+Each die plays `assets/effects/dice-fire-clean.mp4` when doubles land. This is
+a repaired copy of the supplied `dice-fire.mp4`: affected lettering pixels
+are reconstructed from nearby flame pixels before export. The original clip
+is retained as the source. A simple SVG filter makes the black background
+transparent during playback; the video repair is baked into the asset. Each
+copy is cropped around its flame and widened behind the die so its curls show
+on both sides, including during the next 3D roll. The flames stay lit while the
+doubles chain continues. A cashout triggers a floating
+bonus label, sparks, and a score-plaque pulse. The multiplier is reconstructed
+from saved dice, so refreshing does not remove it. Fire pauses off the play
+page or in a hidden tab; reduced-motion mode uses a static flame and brief roll.
+
+`scoring.js` supplies the same awarded points to play, profile, history, and
+achievements. Runs carry `scoringVersion: 2` and a `bonusStart` index. Older
+scores stay unchanged; an unfinished legacy run starts the new rules at its
+next roll, with only its last double arming an initial 2× bonus.
+
+**Before publishing this update, run [supabase/doubles-bonus.sql](supabase/doubles-bonus.sql)
+in the Supabase SQL Editor.** New projects already receive these functions from
+`schema.sql`. The migration preserves existing rows and users. Account play
+checks the server's scoring version before sending a new-rule run, preventing
+the old function from recording a bonus roll with an incorrect score.
+
+Open `tests/scoring.html` for 18 memory-only scoring/account checks and
+`tests/achievements.html` for the achievement regression checks. To verify the
+database function, serve the repository on localhost and open
+`tests/scoring-sql.html`: it downloads a pinned PGlite package and runs 13 checks
+in a temporary in-memory database, never your Supabase project.
 
 The first roll uses two fair dice, giving a 1-in-6 chance of seven. Each subsequent
 roll has a 1-in-7 chance of seven. Adjust `subsequentBustChance` in `script.js` to

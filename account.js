@@ -39,6 +39,7 @@ class DicedleAccounts extends EventTarget {
     this.initialized = false;
     this.revision = 0;
     this.refreshing = null;
+    this.doublesScoringReady = false;
     this.returningFromLogin = /access_token=|error_description=/.test(location.hash);
     this.message = this.configured ? "Connecting your account..." : "Accounts are not available yet. You can keep playing as a guest.";
   }
@@ -419,6 +420,17 @@ class DicedleAccounts extends EventTarget {
 
   async saveRun(run, record = null, importing = false) {
     const revision = this.revision;
+    if ((run?.scoringVersion === 2 || record?.scoringVersion === 2) && !this.doublesScoringReady) {
+      // Refuse the write before sending dice to an older scoring function.
+      const rules = await this.client.rpc("dicedle_scoring_version");
+      if (revision !== this.revision) throw new Error("Account changed");
+      if (rules.error || rules.data !== 2) {
+        const error = new Error("Account scoring is being updated. Please try again later.");
+        error.code = "SCORING_UPDATE_REQUIRED";
+        throw error;
+      }
+      this.doublesScoringReady = true;
+    }
     const { data, error } = await this.client.rpc("save_dicedle_run", {
       p_day: run?.date || record.date, p_run: run, p_record: record, p_import: importing,
       p_expected_user: this.user.id,
@@ -427,6 +439,11 @@ class DicedleAccounts extends EventTarget {
     if (revision !== this.revision) throw new Error("Account changed");
     const row = Array.isArray(data) ? data[0] : data;
     if (!row) throw new Error("No saved run returned");
+    if (row.run?.scoringVersion === 2 && (!new DicedleHistory(() => this.storage).validRun(row.run)
+      || row.record?.score !== DicedleScoring.analyze(row.run).total
+      || row.record?.scoringVersion !== 2 || row.record?.bonusStart !== row.run.bonusStart)) {
+      throw new Error("Account bonus score could not be confirmed");
+    }
     this.applyRow(row);
     this.message = "Your scores are up to date.";
     this.render();

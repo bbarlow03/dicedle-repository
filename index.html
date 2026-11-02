@@ -17,8 +17,18 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="arcade.css" />
     <link rel="stylesheet" href="achievements.css" />
+    <link rel="stylesheet" href="dice-effects.css" />
   </head>
   <body class="is-play-page">
+    <svg class="fire-filter" aria-hidden="true" width="0" height="0" focusable="false">
+      <defs>
+        <filter id="fire-remove-black" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+          <!-- Keep the warm flame colors; make the neutral background transparent. -->
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  1.4 0 -1.4 0 0" />
+          <feComponentTransfer><feFuncA type="linear" slope="1.03" intercept="-.03" /></feComponentTransfer>
+        </filter>
+      </defs>
+    </svg>
     <main class="app-shell">
       <header class="site-header">
         <div class="brand-lockup">
@@ -34,6 +44,7 @@
           <a class="nav-link" id="achievements-link" href="#achievements">ACHIEVEMENTS</a>
         </nav>
         <div class="header-actions">
+          <button class="icon-button sound-icon" id="sound-button" type="button" aria-label="Mute sound" aria-pressed="false" title="Mute sound"><svg viewBox="0 0 16 16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M1 6h3l5-4v12l-5-4H1z"/><g data-sound-on><path d="M11 5h1v1h1v4h-1v1h-1V9h1V7h-1zm2-3h1v1h1v2h1v6h-1v2h-1v1h-1v-2h1V4h-1z"/></g><g data-sound-off hidden><path d="m11 5 1-1 2 2 1-1 1 1-1 2 1 2-1 1-1-2-2 2-1-1 2-2z"/></g></svg></button>
           <button class="icon-button account-icon" id="account-button" data-open-account aria-label="Sign in or create an account" aria-haspopup="dialog"><svg viewBox="0 0 16 16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M6 1h4v1h1v4h-1v1H6V6H5V2h1zm1 1v1H6v2h1v1h2V5h1V3H9V2zM5 8h6v1h2v2h1v4h-2v-4h-1v-1H5v1H4v4H2v-4h1V9h2z"/></svg></button>
           <button class="icon-button" id="help-button" aria-label="How to play">?</button>
         </div>
@@ -55,24 +66,35 @@
             <div class="score" id="score">0</div>
             <p class="play-best" hidden>Best: <strong id="play-best-score">0</strong></p>
           </div>
-          <div class="rolls-plaque">
+        </div>
+        <div class="roll-tallies">
+          <div class="roll-tally-row">
             <p class="eyebrow">ROLLS</p>
-            <div class="roll-count" id="roll-count">0</div>
-            <p class="play-best" hidden>Best: <strong id="play-best-streak">0</strong></p>
+            <div class="roll-count scratch-tally" id="roll-count" role="img" aria-label="0 rolls"><span class="tally-empty" aria-hidden="true">&mdash;</span></div>
           </div>
         </div>
-        <div class="bust-warning"><span class="warning-dot"></span> 7 = BUST</div>
         <div class="dice-stage" role="group" aria-label="Dice">
+          <div class="die-shell">
           <div class="die" id="die-one" data-value="1" role="img" aria-label="First die, waiting to roll"><span class="pip pip-1"></span><span class="pip pip-2"></span><span class="pip pip-3"></span><span class="pip pip-4"></span><span class="pip pip-5"></span><span class="pip pip-6"></span></div>
+          <div class="die-fire" aria-hidden="true"><video class="die-fire-video" src="assets/effects/dice-fire-clean.mp4" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture></video></div>
+          </div>
           <div class="plus" aria-hidden="true">+</div>
+          <div class="die-shell">
           <div class="die" id="die-two" data-value="1" role="img" aria-label="Second die, waiting to roll"><span class="pip pip-1"></span><span class="pip pip-2"></span><span class="pip pip-3"></span><span class="pip pip-4"></span><span class="pip pip-5"></span><span class="pip pip-6"></span></div>
+          <div class="die-fire" aria-hidden="true"><video class="die-fire-video" src="assets/effects/dice-fire-clean.mp4" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture></video></div>
+          </div>
+          <span class="bonus-indicator" id="bonus-indicator" hidden></span>
+          <div class="bust-impact" id="bust-impact" aria-hidden="true" hidden></div>
         </div>
+        <div class="bonus-burst" id="bonus-burst" aria-hidden="true" hidden></div>
         <div class="roll-result" id="roll-result">Ready when you are</div>
         <button class="roll-button" id="roll-button" aria-describedby="game-status"><span id="roll-button-label">ROLL</span><small id="roll-button-caption">take your chance</small></button>
-        <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">Every roll adds to your score. Seven ends the run.</div>
-        <div class="daily-status" id="daily-status" hidden>
-          <p id="daily-message">One run per day. Make it count.</p>
-          <p class="reset-label">NEXT RUN IN <time id="reset-countdown">--:--:--</time><span id="reset-note">A fresh chance tomorrow</span></p>
+        <div class="run-messages" id="run-messages">
+          <div class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true">Every roll adds to your score. Seven ends the run.</div>
+          <div class="daily-status" id="daily-status" hidden>
+            <p id="daily-message">One run per day. Make it count.</p>
+            <p class="reset-label">NEXT RUN IN <time id="reset-countdown">--:--:--</time><span id="reset-note">A fresh chance tomorrow</span></p>
+          </div>
         </div>
       </section>
 
@@ -174,8 +196,9 @@
       <h2 id="welcome-title" tabindex="-1" autofocus>Dicedle<span>.</span></h2>
       <p class="welcome-odds">how far can you go till your luck runs dry?</p>
       <div class="welcome-copy">
-        <p>Press <strong>ROLL</strong> to throw two dice. Each roll adds its total to your <strong>score</strong>. Keep rolling and see how high you can go.</p>
-        <p>Roll a <strong>7</strong>? You get those <strong>7 points</strong>, then you <strong>bust</strong>. That's your final score.</p>
+        <p>Press <strong>ROLL</strong> to throw two dice and build your <strong>score</strong>. Doubles set your next roll on fire: <strong>2× points</strong>!</p>
+        <p>Keep rolling doubles to raise the next bonus: <strong>2×, 4×, 8×, 16×...</strong> A non-double cashes it in and resets the bonus.</p>
+        <p>Roll a <strong>7</strong>? Collect its points, including any bonus, then you <strong>bust</strong>. That's your final score.</p>
         <p id="welcome-daily-rule"><strong>One run</strong>, that's it. Your next chance arrives with the rise of a <strong>new day</strong>.</p>
       </div>
       <p class="welcome-note">Your run is saved in this browser. Want to keep it across devices? You can sign in from your profile whenever you like.</p>
@@ -186,9 +209,10 @@
       <button class="modal-close" data-close-modal aria-label="Close">×</button>
       <p class="eyebrow">How to play</p>
       <h2 id="help-title">Make every roll count.</h2>
-      <p>Press ROLL to throw two dice. Every roll adds its total to your score. Roll a seven and your run is instantly over. No revives, no second chances until a new day comes.</p>
+      <p>Press ROLL to throw two dice and add points to your score. Doubles make the next roll worth 2× points. Consecutive doubles raise that bonus to 4×, 8×, 16×, and beyond.</p>
+      <p>A non-double earns the current bonus and resets it. A seven also earns the current bonus, then ends your run.</p>
       <div class="legend"><span class="legend-tile exact">+</span> Safe roll — added to your score</div>
-      <div class="legend"><span class="legend-tile close">7</span> Add 7 points, then bust</div>
+      <div class="legend"><span class="legend-tile close">7</span> Add its points and any bonus, then bust</div>
       <p id="help-daily-rule">You get one run per day. Refreshing or reopening the site resumes your saved run. After a bust, come back the next day for a fresh start.</p>
       <p>Guest progress is saved in this browser. Sign in from your profile to save your scores to an account and resume on another device.</p>
     </dialog>
@@ -250,10 +274,13 @@
     </dialog>
     <div id="achievement-toasts" popover="manual" role="status" aria-live="polite" aria-atomic="false" hidden></div>
     <script src="config.js"></script>
+    <script src="scoring.js"></script>
     <script src="history.js"></script>
     <script src="account.js"></script>
     <script src="achievements.js"></script>
+    <script src="sound.js"></script>
     <script src="achievements-ui.js"></script>
+    <script src="dice-effects.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

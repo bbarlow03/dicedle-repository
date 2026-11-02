@@ -20,6 +20,7 @@ class DicedleHistory {
 
   validRun(run) {
     return Boolean(run && this.validDate(run.date) && Array.isArray(run.rolls)
+      && DicedleScoring.validRules(run, run.rolls.length)
       && run.rolls.every((dice, index) => Array.isArray(dice) && dice.length === 2
         && dice.every(value => Number.isInteger(value) && value >= 1 && value <= 6)
         && (dice[0] + dice[1] !== 7 || index === run.rolls.length - 1)));
@@ -33,11 +34,12 @@ class DicedleHistory {
       id: run.date,
       mode: "daily",
       date: run.date,
-      score: run.rolls.reduce((score, dice) => score + dice[0] + dice[1], 0),
+      score: DicedleScoring.analyze(run).total,
       rollCount: run.rolls.length,
       outcome: lastRoll[0] + lastRoll[1] === 7 ? "busted" : run.date < today ? "day-ended" : "in-progress",
       recordedAt: this.now(),
       rolls: run.rolls.map(dice => [...dice]),
+      ...DicedleScoring.metadata(run),
     };
   }
 
@@ -45,8 +47,9 @@ class DicedleHistory {
     return Boolean(record && record.version === 1 && record.mode === "daily"
       && record.id === record.date && this.validDate(record.date)
       && Number.isSafeInteger(record.rollCount) && record.rollCount > 0
+      && DicedleScoring.validRules(record, record.rollCount)
       && Number.isSafeInteger(record.score) && record.score >= record.rollCount * 2
-      && record.score <= record.rollCount * 12
+      && record.score <= (record.scoringVersion === 2 ? Number.MAX_SAFE_INTEGER : record.rollCount * 12)
       && ["busted", "day-ended"].includes(record.outcome)
       && Number.isFinite(record.recordedAt));
   }
@@ -79,9 +82,9 @@ class DicedleHistory {
 
   recordRun(record) {
     if (!this.validRecord(record)) return null;
-    const run = { date: record.date, rolls: record.rolls };
+    const run = { date: record.date, rolls: record.rolls, ...DicedleScoring.metadata(record) };
     if (!this.validRun(run) || run.rolls.length !== record.rollCount
-      || run.rolls.reduce((sum, dice) => sum + dice[0] + dice[1], 0) !== record.score) return null;
+      || DicedleScoring.analyze(run).total !== record.score) return null;
     const last = run.rolls.at(-1);
     if ((last[0] + last[1] === 7) !== (record.outcome === "busted")) return null;
     return run;

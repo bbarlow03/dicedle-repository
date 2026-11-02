@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Dicedle database scoring checks</title></head>
+  <body>
+    <h1>Database scoring checks</h1>
+    <p>Serve this repository on localhost to run these checks. They download a pinned PGlite build and use a temporary in-memory database, never Supabase.</p>
+    <pre id="results">Loading...</pre>
+    <script src="../scoring.js"></script>
+    <script src="scoring-sql.test.js"></script>
+    <script type="module">
+      const output = document.querySelector('#results');
+      try {
+        if (location.protocol === 'file:') throw new Error('Open this page through a local HTTP server.');
+        const { PGlite } = await import('https://cdn.jsdelivr.net/npm/@electric-sql/pglite@0.3.14/dist/index.js');
+        const [schema, migration] = await Promise.all(['../supabase/schema.sql', '../supabase/doubles-bonus.sql'].map(async url => {
+          const response = await fetch(url); if (!response.ok) throw new Error('Could not load SQL fixture'); return response.text();
+        }));
+        const report = await runDicedleBonusSqlTests(PGlite, schema, migration);
+        output.textContent = JSON.stringify(report, null, 2);
+      } catch (error) { output.textContent = error.message; }
+    </script>
+  </body>
+</html>
