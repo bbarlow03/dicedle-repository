@@ -53,6 +53,8 @@ and restoration instructions. The backup is not published to the website.
 `sound.js` generates the chiptune effects locally with Web Audio after player
 interaction. The speaker button beside account/help controls mutes every effect,
 including achievement chimes, and saves its setting for this browser.
+Quieter retro cues cover buttons, navigation, dialogs, filters, search, forms,
+and account success/error feedback. Background account refreshes stay silent.
 
 ## Optional email accounts
 

@@ -25,6 +25,7 @@ const accounts = new DicedleAccounts(window.DICEDLE_CONFIG);
 const scoreHistory = new DicedleHistory(() => accounts.storage);
 const achievementBook = new DicedleAchievements(() => accounts.storage);
 const sound = new DicedleSound(document.querySelector("#sound-button"));
+accounts.addEventListener("feedback", event => sound.ui(event.detail, false));
 const achievementView = new DicedleAchievementsView();
 const diceEffects = new DicedleDiceEffects();
 let achievementScope = accounts.storage.namespace;
@@ -412,6 +413,7 @@ async function roll() {
       ? "Your roll could not be confirmed. Reconnect, then sync scores from your account before rolling again."
       : "Your roll could not be saved. Allow saved site data in your browser, then reload to play.";
     renderGame();
+    sound.play("error");
   }
 }
 

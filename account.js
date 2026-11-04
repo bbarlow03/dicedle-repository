@@ -49,6 +49,10 @@ class DicedleAccounts extends EventTarget {
     this.dispatchEvent(new Event("change"));
   }
 
+  feedback(kind) {
+    this.dispatchEvent(new CustomEvent("feedback", { detail: kind }));
+  }
+
   render() {
     const signedIn = Boolean(this.user);
     document.querySelector("#account-button").classList.toggle("is-signed-in", signedIn);
@@ -118,7 +122,7 @@ class DicedleAccounts extends EventTarget {
     }));
     document.querySelector("#account-modal").addEventListener("close", () => this.clearPasswords());
     document.querySelector("#account-sign-out").addEventListener("click", () => this.signOut());
-    document.querySelector("#account-sync").addEventListener("click", () => this.refresh());
+    document.querySelector("#account-sync").addEventListener("click", () => this.refresh(true));
     document.querySelector("#account-import").addEventListener("click", () => this.importGuest());
     this.render();
   }
@@ -241,12 +245,16 @@ class DicedleAccounts extends EventTarget {
       if (mode === "signin") {
         const { data, error } = await this.client.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        if (revision === this.revision) await this.useSession(data.session);
+        if (revision === this.revision) {
+          await this.useSession(data.session);
+          if (this.user?.id === data.session?.user?.id && this.user) this.feedback("success");
+        }
       } else if (mode === "signup") {
         const username = document.querySelector("#account-username").value.trim();
         const available = await this.client.rpc("dicedle_username_available", { p_username: username });
         if (available.error) throw available.error;
-        if (!available.data) { this.message = "That username is already taken. Please choose another."; return; }
+        if (revision !== this.revision) return;
+        if (!available.data) { this.message = "That username is already taken. Please choose another."; this.feedback("error"); return; }
         const { data, error } = await this.client.auth.signUp({ email, password,
           options: { data: { username }, emailRedirectTo: this.redirectUrl() },
         });
@@ -257,9 +265,11 @@ class DicedleAccounts extends EventTarget {
           // automatically signed-in signup if that setting was turned off.
           await this.client.auth.signOut({ scope: "local" });
           this.message = "Account setup needs email confirmation enabled. Please contact the site owner.";
+          this.feedback("error");
         } else {
           this.message = "Check your email to confirm your account before signing in. If you already have an account, sign in or reset your password.";
           this.authMode = "signin";
+          this.feedback("success");
         }
       } else {
         const request = mode === "reset"
@@ -274,9 +284,11 @@ class DicedleAccounts extends EventTarget {
           ? "If an account exists for that email, a password reset link is on its way. Open it to choose a new password."
           : mode === "confirm" ? "If that account needs confirmation, a confirmation email is on its way."
             : "If an account exists for that email, a sign-in link is on its way. Open it to sign in.";
+        this.feedback("success");
       }
     } catch (error) {
       if (revision !== this.revision) return;
+      this.feedback("error");
       if (error.code === "email_not_confirmed") {
         this.message = "Confirm your email before signing in. You can request another confirmation email below.";
       } else if (error.code === "invalid_credentials") {
@@ -309,8 +321,12 @@ class DicedleAccounts extends EventTarget {
       this.username = data;
       document.querySelector("#account-edit-username").value = data;
       this.message = "Your username is saved.";
+      this.feedback("success");
     } catch (error) {
-      if (revision === this.revision) this.message = error.code === "23505" ? "That username is already taken. Please choose another." : "Your username could not be saved. Please try again.";
+      if (revision === this.revision) {
+        this.message = error.code === "23505" ? "That username is already taken. Please choose another." : "Your username could not be saved. Please try again.";
+        this.feedback("error");
+      }
     } finally { if (revision === this.revision) { this.busy = false; this.render(); } }
   }
 
@@ -331,10 +347,14 @@ class DicedleAccounts extends EventTarget {
       this.user = data.user;
       this.recoveryPending = false;
       this.message = "Your password is saved. You can now sign in with your email and password.";
+      this.feedback("success");
     } catch (error) {
-      if (revision === this.revision) this.message = error.code === "reauthentication_needed"
-        ? "Sign in again with a fresh email link, then retry changing your password."
-        : "Your password could not be saved. Use at least 8 characters, or request a fresh password reset link.";
+      if (revision === this.revision) {
+        this.message = error.code === "reauthentication_needed"
+          ? "Sign in again with a fresh email link, then retry changing your password."
+          : "Your password could not be saved. Use at least 8 characters, or request a fresh password reset link.";
+        this.feedback("error");
+      }
     } finally {
       this.clearPasswords();
       if (revision === this.revision) { this.busy = false; this.render(); }
@@ -349,10 +369,14 @@ class DicedleAccounts extends EventTarget {
     try {
       const { error } = await this.client.auth.signOut({ scope: "local" });
       if (error) throw error;
-      if (revision === this.revision) await this.useSession(null);
+      if (revision === this.revision) {
+        await this.useSession(null);
+        if (!this.user) this.feedback("success");
+      }
     } catch {
       if (revision !== this.revision) return;
       this.message = "Sign-out could not finish. Please try again.";
+      this.feedback("error");
       this.busy = false;
       this.render();
     }
@@ -374,7 +398,7 @@ class DicedleAccounts extends EventTarget {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   }
 
-  async refresh() {
+  async refresh(announce = false) {
     if (!this.user || !this.client) return;
     if (this.refreshing) return this.refreshing;
     const revision = this.revision;
@@ -407,9 +431,11 @@ class DicedleAccounts extends EventTarget {
         this.message = this.recoveryPending ? "Choose a new password below to finish resetting your account."
           : profile.error ? "Your scores are up to date. Username settings are temporarily unavailable."
             : this.username ? "Your scores are up to date." : "Your scores are up to date. Choose your username in account settings.";
+        if (announce) this.feedback("success");
       } catch {
         if (revision !== this.revision) return;
         this.message = "Your saved copy is available here. Reconnect and sync before rolling to save your next roll.";
+        if (announce) this.feedback("error");
       } finally {
         if (revision === this.revision) { this.busy = false; this.refreshing = null; this.changed(); }
       }
@@ -465,9 +491,15 @@ class DicedleAccounts extends EventTarget {
         if (record.date !== current?.date) await this.saveRun(null, record, true);
       }
       if (current?.rolls.length && current.date <= this.today()) await this.saveRun(current, null, true);
-      if (revision === this.revision) this.message = "This device's guest scores are saved. Existing account runs were kept if the same day was already saved.";
+      if (revision === this.revision) {
+        this.message = "This device's guest scores are saved. Existing account runs were kept if the same day was already saved.";
+        this.feedback("success");
+      }
     } catch {
-      if (revision === this.revision) this.message = "Some guest scores could not be saved. Your originals are still on this device; try again when connected.";
+      if (revision === this.revision) {
+        this.message = "Some guest scores could not be saved. Your originals are still on this device; try again when connected.";
+        this.feedback("error");
+      }
     } finally {
       if (revision === this.revision) { this.busy = false; this.changed(); }
     }

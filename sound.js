@@ -8,12 +8,13 @@ class DicedleSound {
     this.volume = .24;
     this.voices = new Map();
     this.landingUntil = 0;
+    this.uiTimes = new Map();
     this.muted = this.readMuted();
     this.AudioContext = window.AudioContext || window.webkitAudioContext;
     this.renderButton();
     button.addEventListener("click", () => {
       this.setMuted(!this.muted);
-      if (!this.muted) this.unlock();
+      if (!this.muted) this.unlock().then(ready => { if (ready) this.play("select"); });
     });
     document.addEventListener("pointerdown", event => {
       if (event.isTrusted) this.unlock();
@@ -22,6 +23,7 @@ class DicedleSound {
       if (event.isTrusted && (event.key === "Enter" || event.key === " ")) this.unlock();
     });
     document.addEventListener("dicedle:achievement", () => this.play("achievement"));
+    this.bindInteractions();
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden || !this.context) return;
       this.stop(null, true);
@@ -35,6 +37,50 @@ class DicedleSound {
   readMuted() {
     try { return localStorage.getItem(this.preferenceKey) === "1"; }
     catch { return false; }
+  }
+
+  ui(kind, unlock = true) {
+    if (this.muted || document.hidden) return;
+    const now = performance.now();
+    const interval = kind === "error" ? 180 : kind === "type" ? 55 : 35;
+    if (now - (this.uiTimes.get(kind) ?? -Infinity) < interval) return;
+    this.uiTimes.set(kind, now);
+    if (this.context?.state === "running") this.play(kind);
+    else if (unlock) this.unlock().then(ready => {
+      if (ready && performance.now() - now < 250) this.play(kind);
+    });
+  }
+
+  bindInteractions() {
+    // Delegation covers controls added when profile and achievement views render.
+    document.addEventListener("click", event => {
+      const control = event.target.closest?.("button, a[href], summary, select, input:not([type=hidden]), textarea, [role=button]");
+      if (!control || control.id === "sound-button" || control.matches(":disabled, [aria-disabled=true]")
+        || control.closest("[inert]")) return;
+      if ((control.form && control.type === "submit")
+        || control.matches('input[type="checkbox"], input[type="radio"]')) return;
+      let kind = "click";
+      if (control.matches("[data-close-modal], #welcome-play")) kind = "close";
+      else if (control.matches("[data-open-account], #help-button, #welcome-rules, select")) kind = "open";
+      else if (control.matches("summary")) kind = control.parentElement.open ? "close" : "open";
+      else if (control.matches("a[href], #history-next, #history-previous")) kind = "navigate";
+      else if (control.matches("[data-auth-mode], [data-achievement-filter]")) kind = "select";
+      else if (control.matches("#roll-button.is-busted")) kind = "error";
+      this.ui(kind, event.isTrusted);
+    }, true);
+    document.addEventListener("change", event => {
+      if (event.target.matches('select, input[type="checkbox"], input[type="radio"]')
+        && !event.target.matches(":disabled")) this.ui("select", event.isTrusted);
+    });
+    document.addEventListener("input", event => {
+      // Keep search tactile without sounding out email or password keystrokes.
+      if (event.target.id === "achievement-search" && !event.isComposing) this.ui("type", event.isTrusted);
+    });
+    document.addEventListener("submit", () => this.ui("confirm"), true);
+    document.addEventListener("invalid", () => this.ui("error"), true);
+    document.addEventListener("cancel", event => {
+      if (event.target.matches("dialog")) this.ui("close", event.isTrusted);
+    }, true);
   }
 
   renderButton() {
@@ -171,6 +217,21 @@ class DicedleSound {
       this.tone(165, start, .38, .22, "square", 45);
       this.tone(65, start + .015, .62, .28, "triangle", 30);
       this.landingUntil = start + .65;
+    } else if (kind === "click" || kind === "type") {
+      const typing = kind === "type";
+      this.tone(typing ? 1046.5 : 740, start, typing ? .018 : .04, typing ? .035 : .09, "square", typing ? 880 : 580);
+    } else if (kind === "navigate" || kind === "select") {
+      this.tone(kind === "navigate" ? 659.25 : 880, start, .055, .1, "triangle");
+      this.tone(kind === "navigate" ? 880 : 1046.5, start + .035, .065, .09, "triangle");
+    } else if (kind === "open" || kind === "close") {
+      const notes = kind === "open" ? [440, 659.25] : [659.25, 440];
+      notes.forEach((frequency, index) => this.tone(frequency, start + index * .045, .075, .1, "triangle"));
+    } else if (kind === "confirm" || kind === "success") {
+      const notes = kind === "success" ? [523.25, 783.99, 1046.5] : [523.25, 659.25];
+      notes.forEach((frequency, index) => this.tone(frequency, start + index * .055, .1, .12, "triangle"));
+    } else if (kind === "error") {
+      this.tone(196, start, .09, .11, "square", 146.83);
+      this.tone(146.83, start + .075, .1, .09, "square", 110);
     } else if (kind === "achievement") {
       [659.25, 880, 1318.51].forEach((frequency, index) => this.tone(frequency, start + index * .085, .15, .16));
     }
